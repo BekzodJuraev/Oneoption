@@ -36,9 +36,9 @@ class LoginAPIView(APIView):
 class RegistrationAPIView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+        serializer.save()
         # Add any additional logic here, such as sending a welcome email
         return Response({'detail': 'Registration successful'}, status=status.HTTP_201_CREATED)

@@ -7,3 +7,45 @@ from django.contrib.auth.models import User
 class LoginFormSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
+
+
+
+class RegistrationSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(write_only=True)
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("This email address is already registered. Please use a different one.")
+        return value
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long.")
+        return value
+
+    def validate(self, data):
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError("The two password fields didn't match.")
+        return data
+
+    class Meta:
+        model = User
+        fields = ['email', 'password','password2']
+
+
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            email=validated_data['email'],
+            password=validated_data['password'],
+        )
+        Profile.objects.create(
+            username=user,
+            email=user.email
+        )
+
+
+
+        return user
+
+

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 # Create your views here.
-from .serializers import LoginFormSerializer
+from .serializers import LoginFormSerializer,RegistrationSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate,login,logout
@@ -31,3 +31,14 @@ class LoginAPIView(APIView):
                 return Response({'detail': 'Логин или пароль неверны'}, status=status.HTTP_401_UNAUTHORIZED)
 
         return Response({'detail': 'Invalid form data'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RegistrationAPIView(generics.CreateAPIView):
+    serializer_class = RegistrationSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        # Add any additional logic here, such as sending a welcome email
+        return Response({'detail': 'Registration successful'}, status=status.HTTP_201_CREATED)

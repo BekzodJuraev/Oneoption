@@ -17,7 +17,7 @@ class LoginAPIView(APIView):
             email = form.validated_data.get('email')
             password = form.validated_data.get('password')
 
-            user = authenticate(email=email, password=password)
+            user = authenticate(username=email, password=password)
 
             if user is not None:
                 login(request, user)
@@ -42,3 +42,8 @@ class RegistrationAPIView(generics.CreateAPIView):
         serializer.save()
         # Add any additional logic here, such as sending a welcome email
         return Response({'detail': 'Registration successful'}, status=status.HTTP_201_CREATED)
+
+class LogoutAPIView(APIView):
+    def post(self, request):
+        logout(request)
+        return Response({'detail': 'Logout successful'}, status=status.HTTP_200_OK)

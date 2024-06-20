@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'backend',
     'rest_framework',
-    'drf_yasg'
+    'drf_yasg',
 
 
 ]
@@ -130,3 +130,4 @@ AUTHENTICATION_BACKENDS = [
  'django.contrib.auth.backends.ModelBackend',
  'backend.authentication.EmailAuthBackend',
  ]
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

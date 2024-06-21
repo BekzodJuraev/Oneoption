@@ -142,8 +142,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ""
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ""
-#key:"533287501781-bprhtv6qa1sg7ih1vb59r4f4o07n3d4k.apps.googleusercontent.com"
-#secret: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
+
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'  # Redirect to this URL after successful authentication
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/'

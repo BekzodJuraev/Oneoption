@@ -40,10 +40,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password'],
         )
-        Profile.objects.create(
-            username=user,
-            email=user.email
-        )
+
 
 
 

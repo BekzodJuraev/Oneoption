@@ -1,13 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from django.urls import reverse_lazy
+
 from django.http import HttpResponse
 # Create your views here.
+from social_django.utils import load_strategy, load_backend
+from social_core.actions import do_complete
 from .serializers import LoginFormSerializer,RegistrationSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate,login,logout
 from django.http import JsonResponse
 from rest_framework import generics
 from rest_framework.views import APIView
+from social_django.utils import psa
+from rest_framework.authtoken.models import Token
 class LoginAPIView(APIView):
     def post(self, request, *args, **kwargs):
         next_url = request.data.get('next')
@@ -47,3 +54,8 @@ class LogoutAPIView(APIView):
     def post(self, request):
         logout(request)
         return Response({'detail': 'Logout successful'}, status=status.HTTP_200_OK)
+
+
+class SocialLoginView(APIView):
+    def get(self, request):
+        return redirect('/auth/login/google-oauth2/')

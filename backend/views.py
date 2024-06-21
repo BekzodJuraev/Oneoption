@@ -4,7 +4,8 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse
 # Create your views here.
 from social_django.utils import load_strategy, load_backend
-from social_core.actions import do_complete
+from social_core.backends.google import GoogleOAuth2
+from social_core.exceptions import MissingBackend
 from .serializers import LoginFormSerializer,RegistrationSerializer
 from rest_framework.response import Response
 from rest_framework import status
@@ -59,3 +60,9 @@ class LogoutAPIView(APIView):
 class SocialLoginView(APIView):
     def get(self, request):
         return redirect('/auth/login/google-oauth2/')
+
+
+
+def google(request):
+    return render(request,'google.html')
+

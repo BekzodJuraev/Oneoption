@@ -6,6 +6,7 @@ urlpatterns=[
     path('login/',views.LoginAPIView.as_view(),name='login'),
     path('register/',views.RegistrationAPIView.as_view(),name='register'),
     path('logout/',views.LogoutAPIView.as_view(),name='logout'),
-    path('google/',views.SocialLoginView.as_view(),name='google')
+    path('google/',views.SocialLoginView.as_view(),name='google'),
+    path('asd',views.google,name='asd')
 
 ]

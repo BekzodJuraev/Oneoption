@@ -1,1 +1,93 @@
-<a href="{% url 'social:begin' 'google-oauth2' %}"><button class="button button_sm button_no-bg" type="button">
+<!-- frontend/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Example</title>
+</head>
+<body>
+    <h1>Login Example</h1>
+    
+    <div id="auth-form">
+        <label for="email">Email:</label>
+        <input type="email" id="email"><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password"><br><br>
+        
+        <button onclick="login()">Login</button>
+    </div>
+    
+    <div id="profile" style="display: none;">
+        <h2>User Profile</h2>
+        <p id="email"></p>
+        <button onclick="logout()">Logout</button>
+    </div>
+    
+    <script>
+        const baseUrl = 'http://localhost:8000/';
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(baseUrl + 'login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: 'include',  // Include credentials for session-based authentication
+                });
+
+                if (!response.ok) {
+                    throw new Error('Login failed');
+                }
+
+                // Fetch user profile
+                await fetchProfile();
+            } catch (error) {
+                console.error('Login error:', error);
+            }
+        }
+
+        async function logout() {
+            try {
+                await fetch(baseUrl + 'logout/', {
+                    method: 'POST',
+                    credentials: 'include',  // Include credentials for session-based authentication
+                });
+
+                // Reload the page to clear the session and show the login form
+                window.location.reload();
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        async function fetchProfile() {
+            try {
+                const response = await fetch(baseUrl + 'profiles/', {
+                    credentials: 'include',  // Include credentials for session-based authentication
+                });
+
+                if (!response.ok) {
+                    throw new Error('Profile fetch failed');
+                }
+
+                const data = await response.json();
+                document.getElementById('email').textContent = data[0].email;
+
+                // Show profile section
+                document.getElementById('profile').style.display = 'block';
+                document.getElementById('auth-form').style.display = 'none';
+            } catch (error) {
+                console.error('Profile fetch error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

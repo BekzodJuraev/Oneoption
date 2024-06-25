@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-vlc0@-5)^x8ywa*d5soz-br_=xzb2ji75p04i-1d2f3m!m7c6b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -146,3 +146,10 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "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"
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'  # Redirect to this URL after successful authentication
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}

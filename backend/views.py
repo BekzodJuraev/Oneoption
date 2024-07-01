@@ -63,6 +63,4 @@ class SocialLoginView(APIView):
 
 
 
-def google(request):
-    return render(request,'google.html')
 

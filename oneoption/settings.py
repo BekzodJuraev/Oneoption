@@ -27,7 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://dd12-213-230-93-50.ngrok-free.app',
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -151,5 +153,6 @@ SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
 }

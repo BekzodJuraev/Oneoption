@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from social_django.utils import load_strategy, load_backend
 from social_core.backends.google import GoogleOAuth2
 from social_core.exceptions import MissingBackend
-from .serializers import LoginFormSerializer,RegistrationSerializer
+from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -16,7 +16,26 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from social_django.utils import psa
 from rest_framework.authtoken.models import Token
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.permissions import IsAuthenticated
+
+class Change_password(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self,request,*args,**kwargs):
+        serializer = PasswordChangeSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            if not user.check_password(serializer.validated_data['old_password']):
+                return Response({'old_password': ['Wrong password.']}, status=status.HTTP_400_BAD_REQUEST)
+
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            return Response({'success': 'Password has been changed successfully.'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 class LoginAPIView(APIView):
+
     def post(self, request, *args, **kwargs):
         next_url = request.data.get('next')
         form = LoginFormSerializer(data=request.data)
@@ -29,11 +48,13 @@ class LoginAPIView(APIView):
 
             if user is not None:
                 login(request, user)
+                token, created = Token.objects.get_or_create(user=user)  # Get or create a token for the user
 
+                response_data = {'detail': 'Login successful', 'token': token.key}
                 if next_url:
-                    return Response({'detail': 'Login successful', 'next': next_url}, status=status.HTTP_200_OK)
-                else:
-                    return Response({'detail': 'Login successful'}, status=status.HTTP_200_OK)
+                    response_data['next'] = next_url
+
+                return Response(response_data, status=status.HTTP_200_OK)
 
             else:
                 return Response({'detail': 'Логин или пароль неверны'}, status=status.HTTP_401_UNAUTHORIZED)

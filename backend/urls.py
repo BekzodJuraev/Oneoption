@@ -7,6 +7,7 @@ urlpatterns=[
     path('register/',views.RegistrationAPIView.as_view(),name='register'),
     path('logout/',views.LogoutAPIView.as_view(),name='logout'),
     path('google/',views.SocialLoginView.as_view(),name='google'),
+    path('change_password/',views.Change_password.as_view(),name='change_password')
     #path('asd',views.google,name='asd')
 
 ]

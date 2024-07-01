@@ -1,12 +1,16 @@
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
+
 from django.shortcuts import render,redirect
 from django.urls import reverse_lazy
-
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 # Create your views here.
-from social_django.utils import load_strategy, load_backend
-from social_core.backends.google import GoogleOAuth2
-from social_core.exceptions import MissingBackend
-from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer
+from .models import PasswordReset
+from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -73,10 +77,12 @@ class RegistrationAPIView(generics.CreateAPIView):
         return Response({'detail': 'Registration successful'}, status=status.HTTP_201_CREATED)
 
 class LogoutAPIView(APIView):
-    def post(self, request):
-        logout(request)
-        return Response({'detail': 'Logout successful'}, status=status.HTTP_200_OK)
+    permission_classes = [IsAuthenticated]
 
+    def post(self, request):
+        # Delete the token to logout the user
+        request.user.auth_token.delete()
+        return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
 
 class SocialLoginView(APIView):
     def get(self, request):
@@ -84,4 +90,62 @@ class SocialLoginView(APIView):
 
 
 
+class RequestPasswordReset(APIView):
+    serializer_class = ResetPasswordRequestSerializer
 
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        email = serializer.validated_data['email']
+
+        try:
+            user = User.objects.get(email=email)
+        except ObjectDoesNotExist:
+            return Response({"error": "User with this email not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        token_generator = PasswordResetTokenGenerator()
+        token = token_generator.make_token(user)
+        reset = PasswordReset(email=email, token=token)
+        reset.save()
+        #send_email()
+
+        #reset_url = f"{os.environ['PASSWORD_RESET_BASE_URL']}/{token}"
+          # For debugging purposes; remove or use a proper logging system in production
+
+        # Sending reset link via email (commented out for clarity)
+        # ... (email sending code)
+
+        return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+
+
+
+
+
+class PasswordResetConfirm(APIView):
+    serializer_class = PasswordResetSerializer
+
+    def post(self, request, token):
+        serializer = self.serializer_class(data=request.data)
+
+        reset_obj = PasswordReset.objects.filter(token=token).first()
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=reset_obj.email)
+        except User.DoesNotExist:
+            return Response({"error": "Invalid token or user does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        token_generator = PasswordResetTokenGenerator()
+        if not token_generator.check_token(user, token):
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+        reset_obj.delete()
+
+        return Response({"success": "Password has been reset"}, status=status.HTTP_200_OK)

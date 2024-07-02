@@ -3,9 +3,19 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from PIL import Image
+import io
 
 User=get_user_model()
 
+@pytest.fixture
+def photo():
+    file = io.BytesIO()
+    image = Image.new('RGB', (100, 100), color='red')
+    image.save(file, 'png')
+    file.name = 'test.png'
+    file.seek(0)
+    return file
 @pytest.fixture
 def api():
     return APIClient()
@@ -54,9 +64,23 @@ def test_update_profile(test_login,api):
     assert response.data['message'] == 'Profile updated'
     return token
 
-@pytest.mark.django_db
-def test_profile(test_update_profile,api):
+
+
+@pytest.fixture
+def test_photo(test_update_profile,api,photo):
     token = test_update_profile
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('profile')
+    payload={
+        "photo":photo
+    }
+    response=api.patch(url,payload)
+    assert response.status_code == status.HTTP_200_OK
+    return token
+
+@pytest.mark.django_db
+def test_profile(test_photo,api):
+    token = test_photo
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url=reverse('profile')
     response = api.get(url)

@@ -171,3 +171,11 @@ class Profile_View(APIView):
             serializer.save()
             return Response({'message': 'Profile updated'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self,request):
+        profile = self.get_profile()
+        serializer = SetPictures(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'photo updated'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

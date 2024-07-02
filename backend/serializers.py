@@ -11,6 +11,17 @@ class GetProfile(serializers.ModelSerializer):
         model=Profile
         fields = ['first_name','last_name','email','photo']
 
+class UpdateProfile(serializers.ModelSerializer):
+    email=serializers.EmailField(required=False)
+    class Meta:
+        model=Profile
+        fields = ['first_name','last_name','email']
+
+class SetPictures(serializers.ModelSerializer):
+    class Meta:
+        model=Profile
+        fields=['photo']
+
 class ResetPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 class PasswordChangeSerializer(serializers.Serializer):

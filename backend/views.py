@@ -10,7 +10,7 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 # Create your views here.
 from .models import PasswordReset,Profile
-from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile
+from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -155,7 +155,19 @@ class Profile_View(APIView):
     serializer_class=GetProfile
     permission_classes = [IsAuthenticated,]
 
+
+    def get_profile(self):
+        return Profile.objects.get(username=self.request.user)
+
     def get(self,request):
-        get_profile=Profile.objects.get(username=self.request.user)
+        get_profile=self.get_profile()
         serializer = self.serializer_class(get_profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        profile = self.get_profile()
+        serializer = UpdateProfile(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Profile updated'}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -39,13 +39,30 @@ def test_login(test_register,api):
     assert response.data['token']
     return response.data['token']
 
+
+@pytest.fixture
+def test_update_profile(test_login,api):
+    token=test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('profile')
+    payload={
+        "first_name":"Bekzod",
+        "last_name":"Juraev"
+    }
+    response=api.post(url,payload)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['message'] == 'Profile updated'
+    return token
+
 @pytest.mark.django_db
-def test_profile(test_login,api):
-    token = test_login
+def test_profile(test_update_profile,api):
+    token = test_update_profile
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url=reverse('profile')
     response = api.get(url)
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
     assert response.data['email'] == "asda23sasf@gmail.com"
+
+
 

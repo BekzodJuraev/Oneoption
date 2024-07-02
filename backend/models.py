@@ -19,9 +19,12 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         # Update the associated User's email before saving
-        self.username.email = self.email
-        self.username.save()
+        if self.username.email != self.email:
+            self.username.email = self.email
+            self.username.save(update_fields=['email'])
+
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.username.username
+        return self.email

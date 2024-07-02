@@ -6,33 +6,46 @@ from django.contrib.auth import get_user_model
 
 User=get_user_model()
 
+@pytest.fixture
+def api():
+    return APIClient()
 
-@pytest.mark.django_db
-def test_register():
-    client = APIClient()
+@pytest.fixture
+def test_register(api):
+
     url = reverse('register')
     data={
     "email":"asda23sasf@gmail.com",
     "password": "12346789@@",
     "password2": "12346789@@"
     }
-    response = client.post(url,data,format='json')
+    response = api.post(url,data,format='json')
 
     assert response.status_code == status.HTTP_201_CREATED
     assert User.objects.get(email="asda23sasf@gmail.com")
 
-@pytest.mark.django_db
-def test_login():
-    test_register()
-    client = APIClient()
+@pytest.fixture
+def test_login(test_register,api):
+
     url = reverse('login')
     data={
     "email":"asda23sasf@gmail.com",
     "password": "12346789@@"
     }
-    response = client.post(url,data,format='json')
-    print(f"Login response data: {response.data}")
-    print(f"Login response status code: {response.status_code}")
+    response = api.post(url,data,format='json')
+
 
     assert response.status_code == status.HTTP_200_OK
     assert response.data['token']
+    return response.data['token']
+
+@pytest.mark.django_db
+def test_profile(test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url=reverse('profile')
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['email'] == "asda23sasf@gmail.com"
+

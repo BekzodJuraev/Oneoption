@@ -1,8 +1,15 @@
 from rest_framework import serializers
-from .models import Profile
+
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from .models import Profile
 
+
+class GetProfile(serializers.ModelSerializer):
+
+    class Meta:
+        model=Profile
+        fields = ['first_name','last_name','email','photo']
 
 class ResetPasswordRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)

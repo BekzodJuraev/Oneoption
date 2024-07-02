@@ -10,6 +10,7 @@ urlpatterns=[
     path('change_password/',views.Change_password.as_view(),name='change_password'),
     path('password_reset/',views.RequestPasswordReset.as_view(),name='reset_password'),
     path('password_reset/<str:token>/', views.PasswordResetConfirm.as_view(), name='reset-password-confirm'),
+    path('profile/',views.Profile_View.as_view(),name='profile')
     #path('asd',views.google,name='asd')
 
 ]

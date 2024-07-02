@@ -9,8 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 # Create your views here.
-from .models import PasswordReset
-from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer
+from .models import PasswordReset,Profile
+from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -149,3 +149,13 @@ class PasswordResetConfirm(APIView):
         reset_obj.delete()
 
         return Response({"success": "Password has been reset"}, status=status.HTTP_200_OK)
+
+
+class Profile_View(APIView):
+    serializer_class=GetProfile
+    permission_classes = [IsAuthenticated,]
+
+    def get(self,request):
+        get_profile=Profile.objects.get(username=self.request.user)
+        serializer = self.serializer_class(get_profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)

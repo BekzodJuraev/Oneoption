@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import uuid
 
 class PasswordReset(models.Model):
     email = models.EmailField()
@@ -28,3 +29,17 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.email
+
+
+class Referral(models.Model):
+    REFERRAL_TYPES = (
+        ('doxod', 'Doxod'),
+        ('oborot', 'Oborot'),
+        ('sub', 'Sub'),
+    )
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    referral_type = models.CharField(max_length=20, choices=REFERRAL_TYPES)
+
+    def __str__(self):
+        return f"{self.profile.email}"

@@ -179,3 +179,6 @@ class Profile_View(APIView):
             serializer.save()
             return Response({'message': 'photo updated'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+

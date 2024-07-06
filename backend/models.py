@@ -37,9 +37,19 @@ class Referral(models.Model):
         ('oborot', 'Oborot'),
         ('sub', 'Sub'),
     )
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,related_name='referal')
     code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     referral_type = models.CharField(max_length=20, choices=REFERRAL_TYPES)
 
     def __str__(self):
-        return f"{self.profile.email}"
+        return f"{self.profile.email}:{self.referral_type} "
+
+class Register_link(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,related_name='registred_profile')
+    referral=models.ForeignKey(Referral,on_delete=models.CASCADE,related_name='register')
+
+
+    def __str__(self):
+        return self.profile.email
+
+

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Profile,PasswordReset,Referral
+from .models import Profile,PasswordReset,Referral,Register_link
 
 
 @admin.register(Profile)
@@ -15,3 +15,7 @@ class PasswordReset(admin.ModelAdmin):
 @admin.register(Referral)
 class PasswordReset(admin.ModelAdmin):
     list_display = ['profile']
+
+@admin.register(Register_link)
+class PasswordReset(admin.ModelAdmin):
+    list_display = ['referral','profile']

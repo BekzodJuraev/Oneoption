@@ -73,9 +73,11 @@ class RegistrationAPIView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        code = request.query_params.get('code')
+        serializer = self.get_serializer(data=request.data, context={'code': code})
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
 
         return Response({'detail': 'Registration successful'}, status=status.HTTP_201_CREATED)
 

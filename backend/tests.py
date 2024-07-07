@@ -5,6 +5,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from PIL import Image
 import io
+from backend.models import Profile
 
 User=get_user_model()
 
@@ -29,7 +30,7 @@ def test_register(api):
     "password": "12346789@@",
     "password2": "12346789@@"
     }
-    response = api.post(url,data,format='json')
+    response = api.post(url,data)
 
     assert response.status_code == status.HTTP_201_CREATED
     assert User.objects.get(email="asda23sasf@gmail.com")
@@ -107,7 +108,7 @@ def test_get_oborot(test_login,api):
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
 
-@pytest.mark.django_db
+@pytest.fixture
 def test_get_sub(test_login,api):
     token = test_login
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -115,8 +116,23 @@ def test_get_sub(test_login,api):
     response = api.get(url)
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
+    return response.data['code']
 
 
+@pytest.mark.django_db
+def test_register_refer(test_get_sub,api):
+    code = test_get_sub
+    url = f'/register/?code={code}'
+    data = {
+        "email": "pow@gmail.com",
+        "password": "12346789@@",
+        "password2": "12346789@@"
+    }
+    response = api.post(url,data)
+    assert response.status_code == status.HTTP_201_CREATED
+    profile=Profile.objects.get(email="pow@gmail.com")
+    print(profile.recommended_by)
+    assert profile.recommended_by
 
 
 

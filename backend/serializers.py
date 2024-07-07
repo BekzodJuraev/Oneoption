@@ -71,12 +71,22 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        code=self.context.get('code')
+
         user = User.objects.create_user(
             username=validated_data['email'],
             email=validated_data['email'],
             password=validated_data['password'],
         )
-
+        if code:
+            try:
+                ref = Referral.objects.get(code=code)
+                Profile.objects.create(username=user, email=user.email, recommended_by=ref)
+            except Referral.DoesNotExist:
+                # Handle the case where the referral code is not valid
+                Profile.objects.create(username=user, email=user.email)
+        else:
+            Profile.objects.create(username=user, email=user.email)
 
 
 

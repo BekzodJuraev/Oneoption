@@ -2,7 +2,14 @@ from rest_framework import serializers
 
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Profile
+from .models import Profile,Referral
+
+
+class Refferal_Ser(serializers.ModelSerializer):
+    class Meta:
+        model = Referral
+        fields=['code']
+
 
 
 class GetProfile(serializers.ModelSerializer):
@@ -84,3 +91,6 @@ class PasswordResetSerializer(serializers.Serializer):
         if data['new_password'] != data['confirm_password']:
             raise serializers.ValidationError("Passwords do not match.")
         return data
+
+
+

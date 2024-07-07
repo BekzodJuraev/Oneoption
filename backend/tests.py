@@ -88,5 +88,35 @@ def test_profile(test_photo,api):
     assert response.status_code == status.HTTP_200_OK
     assert response.data['email'] == "asda23sasf@gmail.com"
 
+@pytest.mark.django_db
+def test_get_doxod(test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('doxod')
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_get_oborot(test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('oborot')
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+@pytest.mark.django_db
+def test_get_sub(test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('sub')
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+
+
 
 

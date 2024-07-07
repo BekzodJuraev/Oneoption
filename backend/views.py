@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
+from django.contrib.sites.models import Site
 
 from django.shortcuts import render,redirect
 from django.urls import reverse_lazy
@@ -9,8 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 # Create your views here.
-from .models import PasswordReset,Profile
-from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures
+from .models import PasswordReset,Profile,Referral
+from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -22,6 +23,8 @@ from social_django.utils import psa
 from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
+
+
 
 class Change_password(APIView):
     permission_classes = [IsAuthenticated]
@@ -181,4 +184,37 @@ class Profile_View(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class GetRefraldoxod(APIView):
+    serializer_class = Refferal_Ser
+    permission_classes = [IsAuthenticated, ]
 
+
+
+    def get(self,request):
+        queryset = Referral.objects.get(profile=self.request.user.profile,referral_type='doxod')
+        serializer = self.serializer_class(queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class GetRefraloborot(APIView):
+    serializer_class = Refferal_Ser
+    permission_classes = [IsAuthenticated, ]
+
+
+
+    def get(self,request):
+        queryset = Referral.objects.get(profile=self.request.user.profile,referral_type='oborot')
+        serializer = self.serializer_class(queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+class GetRefralsub(APIView):
+    serializer_class = Refferal_Ser
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request):
+        queryset = Referral.objects.get(profile=self.request.user.profile, referral_type='sub')
+        serializer = self.serializer_class(queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)

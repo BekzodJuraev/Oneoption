@@ -13,9 +13,9 @@ class PasswordReset(admin.ModelAdmin):
 
 
 @admin.register(Referral)
-class PasswordReset(admin.ModelAdmin):
+class Referral(admin.ModelAdmin):
     list_display = ['profile']
 
 @admin.register(Register_link)
-class PasswordReset(admin.ModelAdmin):
-    list_display = ['referral','profile']
+class Register_link(admin.ModelAdmin):
+    list_display = ['referral','profile','created_at']

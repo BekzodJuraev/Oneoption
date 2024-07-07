@@ -76,7 +76,7 @@ class RegistrationAPIView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        # Add any additional logic here, such as sending a welcome email
+
         return Response({'detail': 'Registration successful'}, status=status.HTTP_201_CREATED)
 
 class LogoutAPIView(APIView):

@@ -17,6 +17,7 @@ class Profile(Base):
     last_name = models.CharField(max_length=140)
     email = models.EmailField()
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    recommended_by = models.ForeignKey('Referral', on_delete=models.CASCADE, related_name='recommended_profiles', null=True, blank=True)
 
     photo = models.ImageField()
 
@@ -48,12 +49,5 @@ class Referral(models.Model):
     def __str__(self):
         return f"{self.profile.email}:{self.referral_type} "
 
-class Register_link(Base):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,related_name='registred_profile')
-    referral=models.ForeignKey(Referral,on_delete=models.CASCADE,related_name='register')
-
-
-    def __str__(self):
-        return self.profile.email
 
 

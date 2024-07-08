@@ -4,7 +4,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral
 
-
+class Refferal_list_Ser(serializers.ModelSerializer):
+    class Meta:
+        model=Profile
+        fields=['id','nickname']
 class Refferal_Ser(serializers.ModelSerializer):
     class Meta:
         model = Referral

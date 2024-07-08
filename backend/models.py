@@ -13,6 +13,7 @@ class PasswordReset(Base):
 
 class Profile(Base):
     username=models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
+    nickname = models.CharField(max_length=150)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=140)
     email = models.EmailField()

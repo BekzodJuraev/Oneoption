@@ -11,7 +11,8 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 # Create your views here.
 from .models import PasswordReset,Profile,Referral
-from .serializers import LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser
+from .serializers import \
+    LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -220,3 +221,13 @@ class GetRefralsub(APIView):
         queryset = Referral.objects.get(profile=self.request.user.profile, referral_type='sub')
         serializer = self.serializer_class(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
+class Refer_list(APIView):
+    serializer_class = Refferal_list_Ser
+    permission_classes = [IsAuthenticated, ]
+    def get(self,request):
+        queryset=Profile.objects.filter(recommended_by__profile=self.request.user.profile)
+        serializer = self.serializer_class(queryset,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+

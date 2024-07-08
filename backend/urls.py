@@ -14,6 +14,7 @@ urlpatterns=[
     path('referal/doxod',views.GetRefraldoxod.as_view(),name='doxod'),
     path('referal/oborot',views.GetRefraloborot.as_view(),name='oborot'),
     path('referal/sub',views.GetRefralsub.as_view(),name='sub'),
+    path('referal/list',views.Refer_list.as_view(),name='list')
 
     #path('asd',views.google,name='asd')
 

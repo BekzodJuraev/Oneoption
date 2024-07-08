@@ -119,7 +119,7 @@ def test_get_sub(test_login,api):
     return response.data['code']
 
 
-@pytest.mark.django_db
+@pytest.fixture
 def test_register_refer(test_get_sub,api):
     code = test_get_sub
     url = f'/register/?code={code}'
@@ -129,10 +129,27 @@ def test_register_refer(test_get_sub,api):
         "password2": "12346789@@"
     }
     response = api.post(url,data)
+    data1 = {
+        "email": "powerzver98@gmail.com",
+        "password": "12346789@@",
+        "password2": "12346789@@"
+    }
+    response1 = api.post(url,data1)
     assert response.status_code == status.HTTP_201_CREATED
     profile=Profile.objects.get(email="pow@gmail.com")
     print(profile.recommended_by)
     assert profile.recommended_by
+
+@pytest.mark.django_db
+def test_list_get(test_register_refer,test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('list')
+    response = api.get(url)
+    assert response.status_code == status.HTTP_200_OK
+
+
+
 
 
 

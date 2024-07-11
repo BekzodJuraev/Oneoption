@@ -5,7 +5,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from PIL import Image
 import io
-from backend.models import Profile
+from backend.models import Profile,Click_Referral
 
 User=get_user_model()
 
@@ -147,6 +147,14 @@ def test_list_get(test_register_refer,test_login,api):
     url = reverse('list')
     response = api.get(url)
     assert response.status_code == status.HTTP_200_OK
+
+@pytest.mark.django_db
+def test_count_link(test_get_sub,api):
+    code = test_get_sub
+    url = f'/register/?code={code}'
+    response = api.get(url)
+    assert response.status_code == status.HTTP_201_CREATED
+    assert Click_Referral.objects.get(referral_link__code=code)
 
 
 

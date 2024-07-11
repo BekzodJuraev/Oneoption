@@ -7,7 +7,7 @@ from .models import Profile,Referral
 class Refferal_list_Ser(serializers.ModelSerializer):
     class Meta:
         model=Profile
-        fields=['id','nickname']
+        fields=['id','nickname','balance']
 class Refferal_Ser(serializers.ModelSerializer):
     class Meta:
         model = Referral
@@ -81,12 +81,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password'],
         )
+
         if code:
             try:
                 ref = Referral.objects.get(code=code)
                 Profile.objects.create(username=user, email=user.email, recommended_by=ref)
             except Referral.DoesNotExist:
-                # Handle the case where the referral code is not valid
                 Profile.objects.create(username=user, email=user.email)
         else:
             Profile.objects.create(username=user, email=user.email)

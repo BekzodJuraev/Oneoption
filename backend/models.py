@@ -47,8 +47,22 @@ class Referral(models.Model):
     code = models.UUIDField(default=uuid.uuid4, unique=True)
     referral_type = models.CharField(max_length=20, choices=REFERRAL_TYPES)
 
+
+
     def __str__(self):
         return f"{self.profile.email}:{self.referral_type} "
+
+
+
+class Click_Referral(Base):
+    referral_link=models.ForeignKey(Referral,on_delete=models.CASCADE,related_name='referal_link')
+
+    def __str__(self):
+        return self.referral_link.referral_type
+
+
+
+
 
 
 

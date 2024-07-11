@@ -10,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 # Create your views here.
-from .models import PasswordReset,Profile,Referral
+from .models import PasswordReset,Profile,Referral,Click_Referral
 from .serializers import \
     LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser
 from rest_framework.response import Response
@@ -72,6 +72,18 @@ class LoginAPIView(APIView):
 
 class RegistrationAPIView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
+
+    def get(self,request):
+        code = request.query_params.get('code')
+        if code:
+            get_link=Referral.objects.get(code=code)
+            Click_Referral.objects.create(referral_link__code=get_link)
+
+            return Response({'detail': 'Click to link created'}, status=status.HTTP_201_CREATED)
+        return Response({'detail': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
     def post(self, request, *args, **kwargs):
         code = request.query_params.get('code')
@@ -228,6 +240,8 @@ class Refer_list(APIView):
         queryset=Profile.objects.filter(recommended_by__profile=self.request.user.profile)
         serializer = self.serializer_class(queryset,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 
 

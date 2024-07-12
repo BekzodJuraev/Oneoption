@@ -77,7 +77,7 @@ class RegistrationAPIView(generics.CreateAPIView):
         code = request.query_params.get('code')
         if code:
             get_link=Referral.objects.get(code=code)
-            Click_Referral.objects.create(referral_link__code=get_link)
+            Click_Referral.objects.create(referral_link=get_link)
 
             return Response({'detail': 'Click to link created'}, status=status.HTTP_201_CREATED)
         return Response({'detail': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
@@ -237,7 +237,14 @@ class Refer_list(APIView):
     serializer_class = Refferal_list_Ser
     permission_classes = [IsAuthenticated, ]
     def get(self,request):
-        queryset=Profile.objects.filter(recommended_by__profile=self.request.user.profile)
+        queryset = Profile.objects.filter(recommended_by__profile=self.request.user.profile)
+        email = request.query_params.get('email')
+        id = request.query_params.get('id')
+        if email:
+            queryset=queryset.filter(email=email)
+        if id:
+            queryset = queryset.filter(id=id)
+
         serializer = self.serializer_class(queryset,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

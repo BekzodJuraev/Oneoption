@@ -146,6 +146,7 @@ def test_list_get(test_register_refer,test_login,api):
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url = reverse('list')
     response = api.get(url)
+    print(response.data)
     assert response.status_code == status.HTTP_200_OK
 
 @pytest.mark.django_db
@@ -159,5 +160,25 @@ def test_count_link(test_get_sub,api):
 
 
 
+@pytest.mark.django_db
+def test_list_get_email(test_register_refer,test_login,api):
+    token = test_login
+    email="powerzver98@gmail.com"
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = f'/referal/list?email={email}'
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_list_get_id(test_register_refer,test_login,api):
+    token = test_login
+    id = 2
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = f'/referal/list?id={id}'
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
 
 

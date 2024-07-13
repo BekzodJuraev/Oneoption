@@ -7,6 +7,7 @@ urlpatterns=[
     path('register/',views.RegistrationAPIView.as_view(),name='register'),
     path('logout/',views.LogoutAPIView.as_view(),name='logout'),
     path('google/',views.SocialLoginView.as_view(),name='google'),
+    path('google/complete/',views.SocialLoginComplete.as_view(),name='google_complete'),
     path('change_password/',views.Change_password.as_view(),name='change_password'),
     path('password_reset/',views.RequestPasswordReset.as_view(),name='reset_password'),
     path('password_reset/<str:token>/', views.PasswordResetConfirm.as_view(), name='reset-password-confirm'),
@@ -14,8 +15,8 @@ urlpatterns=[
     path('referal/doxod',views.GetRefraldoxod.as_view(),name='doxod'),
     path('referal/oborot',views.GetRefraloborot.as_view(),name='oborot'),
     path('referal/sub',views.GetRefralsub.as_view(),name='sub'),
-    path('referal/list',views.Refer_list.as_view(),name='list')
+    path('referal/list',views.Refer_list.as_view(),name='list'),
 
-    #path('asd',views.google,name='asd')
+    path('asd/',views.index,name='asd')
 
 ]

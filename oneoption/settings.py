@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
-    'pytest_django'
+    'pytest_django',
 
 
 
@@ -60,7 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.sites.middleware.CurrentSiteMiddleware'
+    'django.contrib.sites.middleware.CurrentSiteMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'oneoption.urls'
@@ -76,6 +77,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
 
             ],
         },
@@ -149,8 +152,10 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "533287501781-bprhtv6qa1sg7ih1vb59r4f4o07n3d4k.a
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "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"
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'  # Redirect to this URL after successful authentication
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/google/complete/'  # Redirect to this URL after successful authentication
 SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
+
+
 
 
 REST_FRAMEWORK = {

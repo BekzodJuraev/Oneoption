@@ -1,6 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
+from rest_framework.authentication import TokenAuthentication
 
 from django.shortcuts import render,redirect
 from django.urls import reverse_lazy
@@ -29,6 +30,7 @@ from rest_framework.permissions import IsAuthenticated
 
 class Change_password(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self,request,*args,**kwargs):
         serializer = PasswordChangeSerializer(data=request.data)
         if serializer.is_valid():
@@ -43,6 +45,7 @@ class Change_password(APIView):
 
 
 class LoginAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
 
     def post(self, request, *args, **kwargs):
         next_url = request.data.get('next')
@@ -71,7 +74,10 @@ class LoginAPIView(APIView):
 
 
 class RegistrationAPIView(generics.CreateAPIView):
+    authentication_classes = [TokenAuthentication]
+
     serializer_class = RegistrationSerializer
+
 
     def get(self,request):
         code = request.query_params.get('code')
@@ -95,6 +101,7 @@ class RegistrationAPIView(generics.CreateAPIView):
         return Response({'detail': 'Registration successful'}, status=status.HTTP_201_CREATED)
 
 class LogoutAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -104,11 +111,28 @@ class LogoutAPIView(APIView):
 
 class SocialLoginView(APIView):
     def get(self, request):
+
         return redirect('/auth/login/google-oauth2/')
+
+class SocialLoginComplete(APIView):
+
+
+    def get(self,request):
+        state = request.GET.get('state')
+
+        if state:
+            token, created = Token.objects.get_or_create(user=request.user)
+            response_data = {'detail': 'Login successful via google', 'token': token.key}
+            Profile.objects.get_or_create(username=request.user,email=request.user.email)
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        return Response({'detail': 'Invalid form data'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
 class RequestPasswordReset(APIView):
+    authentication_classes = [TokenAuthentication]
     serializer_class = ResetPasswordRequestSerializer
 
     def post(self, request):
@@ -143,6 +167,7 @@ class RequestPasswordReset(APIView):
 
 
 class PasswordResetConfirm(APIView):
+    authentication_classes = [TokenAuthentication]
     serializer_class = PasswordResetSerializer
 
     def post(self, request, token):
@@ -170,6 +195,7 @@ class PasswordResetConfirm(APIView):
 
 
 class Profile_View(APIView):
+    authentication_classes = [TokenAuthentication]
     serializer_class=GetProfile
     permission_classes = [IsAuthenticated,]
 
@@ -200,6 +226,7 @@ class Profile_View(APIView):
 
 
 class GetRefraldoxod(APIView):
+    authentication_classes = [TokenAuthentication]
     serializer_class = Refferal_Ser
     permission_classes = [IsAuthenticated, ]
 
@@ -212,6 +239,7 @@ class GetRefraldoxod(APIView):
 
 
 class GetRefraloborot(APIView):
+    authentication_classes = [TokenAuthentication]
     serializer_class = Refferal_Ser
     permission_classes = [IsAuthenticated, ]
 
@@ -226,6 +254,7 @@ class GetRefraloborot(APIView):
 
 
 class GetRefralsub(APIView):
+    authentication_classes = [TokenAuthentication]
     serializer_class = Refferal_Ser
     permission_classes = [IsAuthenticated, ]
 
@@ -234,6 +263,7 @@ class GetRefralsub(APIView):
         serializer = self.serializer_class(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
 class Refer_list(APIView):
+    authentication_classes = [TokenAuthentication]
     serializer_class = Refferal_list_Ser
     permission_classes = [IsAuthenticated, ]
     def get(self,request):
@@ -251,4 +281,5 @@ class Refer_list(APIView):
 
 
 
-
+def index(request):
+    return render(request,'google.html')

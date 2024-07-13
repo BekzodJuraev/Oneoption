@@ -24,7 +24,7 @@ def api():
 @pytest.fixture
 def test_register(api):
 
-    url = reverse('register')
+    url = "https://c61e-84-54-72-66.ngrok-free.app/register/"
     data={
     "email":"asda23sasf@gmail.com",
     "password": "12346789@@",
@@ -106,6 +106,7 @@ def test_get_oborot(test_login,api):
     url = reverse('oborot')
     response = api.get(url)
     print(response.data)
+
     assert response.status_code == status.HTTP_200_OK
 
 @pytest.fixture
@@ -179,6 +180,21 @@ def test_list_get_id(test_register_refer,test_login,api):
     url = f'/referal/list?id={id}'
     response = api.get(url)
     print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+
+
+
+@pytest.mark.django_db
+def test_google(api):
+    url=reverse('google')
+    response=api.get(url)
+    assert response.url == "/auth/login/google-oauth2/"
+
+@pytest.mark.django_db
+def test_google_compelte(api):
+    url = reverse('google_complete')
+    response = api.get(url)
     assert response.status_code == status.HTTP_200_OK
 
 

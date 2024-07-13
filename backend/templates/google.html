@@ -1,93 +1,52 @@
-<!-- frontend/index.html -->
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Example</title>
+    <title>Google Sign-In</title>
+    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID">
 </head>
 <body>
-    <h1>Login Example</h1>
-    
-    <div id="auth-form">
-        <label for="email">Email:</label>
-        <input type="email" id="email"><br><br>
-        
-        <label for="password">Password:</label>
-        <input type="password" id="password"><br><br>
-        
-        <button onclick="login()">Login</button>
+    <div id="gSignInWrapper">
+        <div id="customBtn" class="customGPlusSignIn">
+            <span class="icon"></span>
+            <span class="buttonText">Sign in with Google</span>
+        </div>
     </div>
-    
-    <div id="profile" style="display: none;">
-        <h2>User Profile</h2>
-        <p id="email"></p>
-        <button onclick="logout()">Logout</button>
-    </div>
-    
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script>
-        const baseUrl = 'http://localhost:8000/';
+        function onSignIn(googleUser) {
+            const id_token = googleUser.getAuthResponse().id_token;
 
-        async function login() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            try {
-                const response = await fetch(baseUrl + 'login/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password }),
-                    credentials: 'include',  // Include credentials for session-based authentication
-                });
-
-                if (!response.ok) {
-                    throw new Error('Login failed');
+            fetch('/google/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: id_token }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.access) {
+                    // Save tokens
+                    localStorage.setItem('access_token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    // Redirect or update UI
+                    window.location.href = '/';
+                } else {
+                    console.error(data.detail);
                 }
-
-                // Fetch user profile
-                await fetchProfile();
-            } catch (error) {
-                console.error('Login error:', error);
-            }
+            })
+            .catch(error => console.error('Error:', error));
         }
 
-        async function logout() {
-            try {
-                await fetch(baseUrl + 'logout/', {
-                    method: 'POST',
-                    credentials: 'include',  // Include credentials for session-based authentication
+        gapi.load('auth2', function() {
+            gapi.auth2.init().then(function() {
+                const auth2 = gapi.auth2.getAuthInstance();
+                auth2.attachClickHandler(document.getElementById('customBtn'), {}, onSignIn, function(error) {
+                    console.error(JSON.stringify(error));
                 });
-
-                // Reload the page to clear the session and show the login form
-                window.location.reload();
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
-        }
-
-        async function fetchProfile() {
-            try {
-                const response = await fetch(baseUrl + 'profiles/', {
-                    credentials: 'include',  // Include credentials for session-based authentication
-                });
-
-                if (!response.ok) {
-                    throw new Error('Profile fetch failed');
-                }
-
-                const data = await response.json();
-                document.getElementById('email').textContent = data[0].email;
-
-                // Show profile section
-                document.getElementById('profile').style.display = 'block';
-                document.getElementById('auth-form').style.display = 'none';
-            } catch (error) {
-                console.error('Profile fetch error:', error);
-            }
-        }
+            });
+        });
     </script>
 </body>
 </html>

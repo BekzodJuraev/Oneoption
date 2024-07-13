@@ -118,15 +118,21 @@ class SocialLoginComplete(APIView):
 
 
     def get(self,request):
-        state = request.GET.get('state')
+        token = request.GET.get('token')
 
-        if state:
-            token, created = Token.objects.get_or_create(user=request.user)
-            response_data = {'detail': 'Login successful via google', 'token': token.key}
-            Profile.objects.get_or_create(username=request.user,email=request.user.email)
-            return Response(response_data, status=status.HTTP_200_OK)
+        if token:
 
-        return Response({'detail': 'Invalid form data'}, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                token = Token.objects.get(key=token)
+                response_data = {'detail': 'Login successful via google', 'token': token.key}
+                return Response(response_data, status=status.HTTP_200_OK)
+            except:
+                return Response({'detail': 'Not finded token'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
 
 
 

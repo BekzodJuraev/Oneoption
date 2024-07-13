@@ -1,52 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Google Sign-In</title>
-    <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google OAuth2 Login</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <div id="gSignInWrapper">
-        <div id="customBtn" class="customGPlusSignIn">
-            <span class="icon"></span>
-            <span class="buttonText">Sign in with Google</span>
-        </div>
+    <div style="text-align: center; margin-top: 20%;">
+        <h1>Login with Google</h1>
+        <div id="google-login-button"></div>
     </div>
 
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script>
-        function onSignIn(googleUser) {
-            const id_token = googleUser.getAuthResponse().id_token;
+        function handleCredentialResponse(response) {
+            const token = response.credential;
 
-            fetch('/google/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            // Display the token in an alert
+            alert(`Login successful! Your token is: ${token}`);
+
+            // Send the token to your backend for further processing using AJAX
+            $.ajax({
+                url: '/social-login/complete/',
+                method: 'GET',
+                data: { token: token },
+                success: function(data) {
+                    console.log(data);
                 },
-                body: JSON.stringify({ token: id_token }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.access) {
-                    // Save tokens
-                    localStorage.setItem('access_token', data.access);
-                    localStorage.setItem('refresh_token', data.refresh);
-                    // Redirect or update UI
-                    window.location.href = '/';
-                } else {
-                    console.error(data.detail);
+                error: function(error) {
+                    console.error('Error:', error);
                 }
-            })
-            .catch(error => console.error('Error:', error));
+            });
         }
 
-        gapi.load('auth2', function() {
-            gapi.auth2.init().then(function() {
-                const auth2 = gapi.auth2.getAuthInstance();
-                auth2.attachClickHandler(document.getElementById('customBtn'), {}, onSignIn, function(error) {
-                    console.error(JSON.stringify(error));
-                });
+        // Initialize the Google Identity Services
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: 'your-client-id', // Replace with your actual client ID
+                callback: handleCredentialResponse
             });
-        });
+
+            // Render the button
+            google.accounts.id.renderButton(
+                document.getElementById('google-login-button'),
+                { theme: 'outline', size: 'large' }
+            );
+        };
     </script>
 </body>
 </html>

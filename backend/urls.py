@@ -17,6 +17,8 @@ urlpatterns=[
     path('referal/sub',views.GetRefralsub.as_view(),name='sub'),
     path('referal/list',views.Refer_list.as_view(),name='list'),
     path('referal/count/daily',views.Referall_count_daily.as_view(),name='ref_daily'),
+    path('referal/count/weekly',views.Referall_count_weekly.as_view(),name='ref_weekly'),
+    path('referal/count/monthly',views.Referall_count_monthly.as_view(),name='ref_monthly'),
 
     path('asd/',views.index,name='asd')
 

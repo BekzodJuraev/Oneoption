@@ -11,10 +11,10 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
-# Create your views here.
+from django.db.models import Sum,Q,Count,F,Max,Prefetch
 from .models import PasswordReset,Profile,Referral,Click_Referral
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -294,6 +294,22 @@ class Referall_count_daily(APIView):
         serializer = self.serializer_class({"count": queryset})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class Referall_count_weekly(APIView):
+    serializer_class = Refferal_count_all_
+    permission_classes = [IsAuthenticated, ]
+    def get(self,request):
+        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(count=Count('id'))
+        serializer = self.serializer_class(queryset,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class Referall_count_monthly(APIView):
+    serializer_class = Refferal_count_all_
+    permission_classes = [IsAuthenticated, ]
+    def get(self,request):
+        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(days=29)).values('created_at__date').annotate(count=Count('id'))
+        serializer = self.serializer_class(queryset,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 

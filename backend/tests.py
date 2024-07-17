@@ -7,6 +7,10 @@ from PIL import Image
 import io
 from backend.models import Profile,Click_Referral
 
+from django.utils import timezone
+from datetime import timedelta
+from freezegun import freeze_time
+
 User=get_user_model()
 
 @pytest.fixture
@@ -155,12 +159,21 @@ def test_count_link(test_get_sub,api):
     code = test_get_sub
     url = f'/register/?code={code}'
     response = api.get(url)
-    response = api.get(url)
-    response = api.get(url)
-    response = api.get(url)
+
+    with freeze_time(timezone.now() - timedelta(days=1)):
+        response = api.get(url)
+        response = api.get(url)
+
+    with freeze_time(timezone.now() - timedelta(days=7)):
+        response = api.get(url)
+        response = api.get(url)
+
+    with freeze_time(timezone.now() - timedelta(days=29)):
+        response = api.get(url)
+        response = api.get(url)
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert Click_Referral.objects.filter(referral_link__code=code)
+    assert Click_Referral.objects.filter(referral_link__code=code).count() == 7
 
 
 
@@ -202,6 +215,24 @@ def test_ref_daily_count(test_count_link,test_login,api):
     token = test_login
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url =reverse('ref_daily')
+    response= api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+@pytest.mark.django_db
+def test_ref_weekly_count(test_count_link,test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url =reverse('ref_weekly')
+    response= api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+@pytest.mark.django_db
+def test_ref_mothly_count(test_count_link,test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url =reverse('ref_monthly')
     response= api.get(url)
     print(response.data)
     assert response.status_code == status.HTTP_200_OK

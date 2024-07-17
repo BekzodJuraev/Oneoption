@@ -1,10 +1,11 @@
 from rest_framework import serializers
-
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral
 
-
+class Refferal_count_all_(serializers.Serializer):
+    count=serializers.IntegerField()
+    day=serializers.DateField(source='created_at__date')
 class Refferal_count_all(serializers.Serializer):
     count=serializers.IntegerField()
 

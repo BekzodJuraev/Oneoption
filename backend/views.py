@@ -2,7 +2,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from rest_framework.authentication import TokenAuthentication
-
+from django.utils import timezone
+from datetime import date, timedelta, datetime
 from django.shortcuts import render,redirect
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
@@ -12,8 +13,8 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 # Create your views here.
 from .models import PasswordReset,Profile,Referral,Click_Referral
-from .serializers import \
-    LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser
+from .serializers import  \
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -128,7 +129,6 @@ class SocialLoginComplete(APIView):
                 return Response(response_data, status=status.HTTP_200_OK)
             except:
                 return Response({'detail': 'Not finded token'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 
@@ -282,6 +282,16 @@ class Refer_list(APIView):
             queryset = queryset.filter(id=id)
 
         serializer = self.serializer_class(queryset,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class Referall_count_daily(APIView):
+    serializer_class = Refferal_count_all
+    permission_classes = [IsAuthenticated, ]
+    def get(self,request):
+        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
+        serializer = self.serializer_class({"count": queryset})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

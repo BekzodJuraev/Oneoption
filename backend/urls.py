@@ -16,6 +16,7 @@ urlpatterns=[
     path('referal/oborot',views.GetRefraloborot.as_view(),name='oborot'),
     path('referal/sub',views.GetRefralsub.as_view(),name='sub'),
     path('referal/list',views.Refer_list.as_view(),name='list'),
+    path('referal/count/daily',views.Referall_count_daily.as_view(),name='ref_daily'),
 
     path('asd/',views.index,name='asd')
 

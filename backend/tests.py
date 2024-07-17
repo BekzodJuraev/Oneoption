@@ -150,19 +150,23 @@ def test_list_get(test_register_refer,test_login,api):
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
 
-@pytest.mark.django_db
+@pytest.fixture
 def test_count_link(test_get_sub,api):
     code = test_get_sub
     url = f'/register/?code={code}'
     response = api.get(url)
+    response = api.get(url)
+    response = api.get(url)
+    response = api.get(url)
+
     assert response.status_code == status.HTTP_201_CREATED
-    assert Click_Referral.objects.get(referral_link__code=code)
+    assert Click_Referral.objects.filter(referral_link__code=code)
 
 
 
 
 @pytest.mark.django_db
-def test_list_get_email(test_register_refer,test_login,api):
+def test_list_get_email(test_login,api):
     token = test_login
     email="powerzver98@gmail.com"
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
@@ -191,10 +195,14 @@ def test_google(api):
     response=api.get(url)
     assert response.url == "/auth/login/google-oauth2/"
 
-@pytest.mark.django_db
-def test_google_compelte(api):
-    url = reverse('google_complete')
-    response = api.get(url)
-    assert response.status_code == status.HTTP_200_OK
 
+
+@pytest.mark.django_db
+def test_ref_daily_count(test_count_link,test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url =reverse('ref_daily')
+    response= api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
 

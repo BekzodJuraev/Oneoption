@@ -4,6 +4,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral
 
+
+class Refferal_count_all(serializers.Serializer):
+    count=serializers.IntegerField()
+
 class Refferal_list_Ser(serializers.ModelSerializer):
     class Meta:
         model=Profile

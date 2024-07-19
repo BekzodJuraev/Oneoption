@@ -1,6 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
+from drf_yasg.utils import swagger_auto_schema
+
 from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
 from datetime import date, timedelta, datetime
@@ -46,7 +48,11 @@ class Change_password(APIView):
 
 
 class LoginAPIView(APIView):
+
     authentication_classes = [TokenAuthentication]
+
+
+
 
     def post(self, request, *args, **kwargs):
         next_url = request.data.get('next')

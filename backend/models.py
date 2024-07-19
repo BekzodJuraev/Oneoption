@@ -17,8 +17,9 @@ class Profile(Base):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=140)
     email = models.EmailField()
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    deposit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     recommended_by = models.ForeignKey('Referral', on_delete=models.CASCADE, related_name='recommended_profiles', null=True, blank=True)
+    level=models.IntegerField(default=1)
 
     photo = models.ImageField()
 

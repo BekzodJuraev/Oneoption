@@ -12,7 +12,7 @@ class Refferal_count_all(serializers.Serializer):
 class Refferal_list_Ser(serializers.ModelSerializer):
     class Meta:
         model=Profile
-        fields=['id','nickname','balance']
+        fields=['id','nickname','deposit']
 class Refferal_Ser(serializers.ModelSerializer):
     class Meta:
         model = Referral
@@ -24,7 +24,7 @@ class GetProfile(serializers.ModelSerializer):
 
     class Meta:
         model=Profile
-        fields = ['first_name','last_name','email','photo']
+        fields = ['first_name','last_name','email','photo','deposit','level']
 
 class UpdateProfile(serializers.ModelSerializer):
     email=serializers.EmailField(required=False)

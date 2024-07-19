@@ -4,7 +4,7 @@ from .models import Profile,PasswordReset,Referral,Click_Referral
 
 @admin.register(Profile)
 class Profileadmin(admin.ModelAdmin):
-    list_display = ['username','email','deposit']
+    list_display = ['username','email','deposit','recommended_by']
 
 # Register your models here.
 @admin.register(PasswordReset)

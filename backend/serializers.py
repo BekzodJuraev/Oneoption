@@ -3,6 +3,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral
 
+
+class GetProfile_main(serializers.ModelSerializer):
+    all_click=serializers.IntegerField()
+    register_count=serializers.IntegerField()
+    class Meta:
+        model=Profile
+        fields=['all_click','register_count','deposit']
 class Refferal_count_all_(serializers.Serializer):
     count=serializers.IntegerField()
     day=serializers.DateField(source='created_at__date')
@@ -24,7 +31,7 @@ class GetProfile(serializers.ModelSerializer):
 
     class Meta:
         model=Profile
-        fields = ['first_name','last_name','email','photo','deposit','level']
+        fields = ['first_name','last_name','email','photo','level']
 
 class UpdateProfile(serializers.ModelSerializer):
     email=serializers.EmailField(required=False)

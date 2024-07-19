@@ -12,6 +12,7 @@ urlpatterns=[
     path('password_reset/',views.RequestPasswordReset.as_view(),name='reset_password'),
     path('password_reset/<str:token>/', views.PasswordResetConfirm.as_view(), name='reset-password-confirm'),
     path('profile/',views.Profile_View.as_view(),name='profile'),
+    path('profile/mainpage',views.GetMain.as_view(),name='profile_main'),
     path('referal/doxod',views.GetRefraldoxod.as_view(),name='doxod'),
     path('referal/oborot',views.GetRefraloborot.as_view(),name='oborot'),
     path('referal/sub',views.GetRefralsub.as_view(),name='sub'),

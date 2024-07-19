@@ -16,7 +16,7 @@ from django.http import HttpResponse
 from django.db.models import Sum,Q,Count,F,Max,Prefetch
 from .models import PasswordReset,Profile,Referral,Click_Referral
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -315,6 +315,23 @@ class Referall_count_monthly(APIView):
     def get(self,request):
         queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(days=29)).values('created_at__date').annotate(count=Count('id'))
         serializer = self.serializer_class(queryset,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetMain(APIView):
+    serializer_class=GetProfile_main
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self,request):
+        profile = self.request.user.profile
+        click_all=Click_Referral.objects.filter(referral_link__profile=profile).count()
+        register_count=Profile.objects.filter(recommended_by__profile=profile).count()
+
+        queryset={
+            "all_click":click_all,
+            "register_count":register_count,
+            "deposit":profile.deposit
+        }
+        serializer = self.serializer_class(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

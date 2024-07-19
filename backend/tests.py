@@ -237,3 +237,11 @@ def test_ref_mothly_count(test_count_link,test_login,api):
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
 
+@pytest.mark.django_db
+def test_getprofile_main(test_count_link,test_register_refer,test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url =reverse('profile_main')
+    response= api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK

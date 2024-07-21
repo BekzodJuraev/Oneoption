@@ -34,6 +34,12 @@ from rest_framework.permissions import IsAuthenticated
 class Change_password(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: PasswordChangeSerializer()}
+    )
+
+
+
     def post(self,request,*args,**kwargs):
         serializer = PasswordChangeSerializer(data=request.data)
         if serializer.is_valid():
@@ -51,9 +57,9 @@ class LoginAPIView(APIView):
 
     authentication_classes = [TokenAuthentication]
 
-
-
-
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: LoginFormSerializer()}
+    )
     def post(self, request, *args, **kwargs):
         next_url = request.data.get('next')
         form = LoginFormSerializer(data=request.data)
@@ -147,6 +153,10 @@ class RequestPasswordReset(APIView):
     authentication_classes = [TokenAuthentication]
     serializer_class = ResetPasswordRequestSerializer
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: ResetPasswordRequestSerializer()}
+    )
+
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
@@ -182,6 +192,10 @@ class PasswordResetConfirm(APIView):
     authentication_classes = [TokenAuthentication]
     serializer_class = PasswordResetSerializer
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: PasswordResetSerializer()}
+    )
+
     def post(self, request, token):
         serializer = self.serializer_class(data=request.data)
 
@@ -215,11 +229,17 @@ class Profile_View(APIView):
     def get_profile(self):
         return Profile.objects.get(username=self.request.user)
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: GetProfile()}
+    )
     def get(self,request):
         get_profile=self.get_profile()
         serializer = self.serializer_class(get_profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: UpdateProfile()}
+    )
     def post(self, request):
         profile = self.get_profile()
         serializer = UpdateProfile(profile, data=request.data, partial=True)
@@ -228,6 +248,9 @@ class Profile_View(APIView):
             return Response({'message': 'Profile updated'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: SetPictures()}
+    )
     def patch(self,request):
         profile = self.get_profile()
         serializer = SetPictures(profile, data=request.data, partial=True)
@@ -242,8 +265,9 @@ class GetRefraldoxod(APIView):
     serializer_class = Refferal_Ser
     permission_classes = [IsAuthenticated, ]
 
-
-
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: Refferal_Ser()}
+    )
     def get(self,request):
         queryset = Referral.objects.get(profile=self.request.user.profile,referral_type='doxod')
         serializer = self.serializer_class(queryset)
@@ -255,8 +279,9 @@ class GetRefraloborot(APIView):
     serializer_class = Refferal_Ser
     permission_classes = [IsAuthenticated, ]
 
-
-
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: Refferal_Ser()}
+    )
     def get(self,request):
         queryset = Referral.objects.get(profile=self.request.user.profile,referral_type='oborot')
         serializer = self.serializer_class(queryset)
@@ -270,6 +295,10 @@ class GetRefralsub(APIView):
     serializer_class = Refferal_Ser
     permission_classes = [IsAuthenticated, ]
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: Refferal_Ser()}
+    )
+
     def get(self, request):
         queryset = Referral.objects.get(profile=self.request.user.profile, referral_type='sub')
         serializer = self.serializer_class(queryset)
@@ -278,6 +307,10 @@ class Refer_list(APIView):
     authentication_classes = [TokenAuthentication]
     serializer_class = Refferal_list_Ser
     permission_classes = [IsAuthenticated, ]
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: Refferal_list_Ser(many=True)}
+    )
     def get(self,request):
         queryset = Profile.objects.filter(recommended_by__profile=self.request.user.profile)
         email = request.query_params.get('email')
@@ -295,6 +328,10 @@ class Refer_list(APIView):
 class Referall_count_daily(APIView):
     serializer_class = Refferal_count_all
     permission_classes = [IsAuthenticated, ]
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: Refferal_count_all()}
+    )
     def get(self,request):
         queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
         serializer = self.serializer_class({"count": queryset})
@@ -304,6 +341,10 @@ class Referall_count_daily(APIView):
 class Referall_count_weekly(APIView):
     serializer_class = Refferal_count_all_
     permission_classes = [IsAuthenticated, ]
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: Refferal_count_all_(many=True)}
+    )
     def get(self,request):
         queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(count=Count('id'))
         serializer = self.serializer_class(queryset,many=True)
@@ -312,6 +353,10 @@ class Referall_count_weekly(APIView):
 class Referall_count_monthly(APIView):
     serializer_class = Refferal_count_all_
     permission_classes = [IsAuthenticated, ]
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: Refferal_count_all_(many=True)}
+    )
     def get(self,request):
         queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(days=29)).values('created_at__date').annotate(count=Count('id'))
         serializer = self.serializer_class(queryset,many=True)
@@ -320,6 +365,10 @@ class Referall_count_monthly(APIView):
 class GetMain(APIView):
     serializer_class=GetProfile_main
     permission_classes = [IsAuthenticated, ]
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: GetProfile_main()}
+    )
 
     def get(self,request):
         profile = request.user.profile
@@ -338,6 +387,10 @@ class GetMain_chart_daily(APIView):
     serializer_class=GetProfile_main_chart
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: GetProfile_main_chart()}
+    )
+
     def get(self,reqeust):
         profile=reqeust.user.profile
         clicks=Click_Referral.objects.filter(referral_link__profile=profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
@@ -351,6 +404,10 @@ class GetMain_chart_daily(APIView):
 class GetMain_chart_weekly(APIView):
     serializer_class=GetProfile_main_chart_
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: GetProfile_main_chart_(many=True)}
+    )
     def get(self,request):
         profile=request.user.profile
         clicks=Click_Referral.objects.filter(referral_link__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(click_count=Count('id'))
@@ -385,6 +442,10 @@ class GetMain_chart_weekly(APIView):
 class GetMain_chart_monthly(APIView):
     serializer_class = GetProfile_main_chart_
     permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: GetProfile_main_chart_(many=True)}
+    )
 
     def get(self, request):
         profile = request.user.profile

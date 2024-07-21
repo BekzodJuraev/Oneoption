@@ -4,6 +4,13 @@ from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral
 
 
+class GetProfile_main_chart_(serializers.Serializer):
+    clicks=serializers.IntegerField()
+    register_count=serializers.IntegerField()
+    day=serializers.DateField(source='created_at__date')
+class GetProfile_main_chart(serializers.Serializer):
+    clicks=serializers.IntegerField()
+    register_count=serializers.IntegerField()
 class GetProfile_main(serializers.ModelSerializer):
     all_click=serializers.IntegerField()
     register_count=serializers.IntegerField()

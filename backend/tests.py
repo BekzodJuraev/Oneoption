@@ -159,21 +159,19 @@ def test_count_link(test_get_sub,api):
     code = test_get_sub
     url = f'/register/?code={code}'
     response = api.get(url)
+    response = api.get(url)
 
-    with freeze_time(timezone.now() - timedelta(days=1)):
-        response = api.get(url)
-        response = api.get(url)
 
-    with freeze_time(timezone.now() - timedelta(days=7)):
+    with freeze_time(timezone.now() - timedelta(days=6)):
         response = api.get(url)
         response = api.get(url)
 
-    with freeze_time(timezone.now() - timedelta(days=29)):
+    with freeze_time(timezone.now() - timedelta(days=28)):
         response = api.get(url)
         response = api.get(url)
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert Click_Referral.objects.filter(referral_link__code=code).count() == 7
+    assert Click_Referral.objects.filter(referral_link__code=code).count() == 6
 
 
 
@@ -245,3 +243,30 @@ def test_getprofile_main(test_count_link,test_register_refer,test_login,api):
     response= api.get(url)
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
+
+@pytest.mark.django_db
+def test_main_chart_daily(test_count_link,test_register_refer,test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url =reverse('main_chart_daily')
+    response= api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+@pytest.mark.django_db
+def test_main_chart_weekly(test_count_link,test_register_refer,test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url =reverse('main_chart_weekly')
+    response= api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+@pytest.mark.django_db
+def test_main_chart_monthly(test_count_link,test_register_refer,test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url =reverse('main_chart_monthly')
+    response= api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+

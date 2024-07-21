@@ -16,7 +16,7 @@ from django.http import HttpResponse
 from django.db.models import Sum,Q,Count,F,Max,Prefetch
 from .models import PasswordReset,Profile,Referral,Click_Referral
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -322,7 +322,7 @@ class GetMain(APIView):
     permission_classes = [IsAuthenticated, ]
 
     def get(self,request):
-        profile = self.request.user.profile
+        profile = request.user.profile
         click_all=Click_Referral.objects.filter(referral_link__profile=profile).count()
         register_count=Profile.objects.filter(recommended_by__profile=profile).count()
 
@@ -333,6 +333,92 @@ class GetMain(APIView):
         }
         serializer = self.serializer_class(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class GetMain_chart_daily(APIView):
+    serializer_class=GetProfile_main_chart
+    permission_classes = [IsAuthenticated]
+
+    def get(self,reqeust):
+        profile=reqeust.user.profile
+        clicks=Click_Referral.objects.filter(referral_link__profile=profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
+        register_count = Profile.objects.filter(recommended_by__profile=profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
+        queryset = {
+            "clicks": clicks,
+            "register_count": register_count,
+        }
+        serializer = self.serializer_class(queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+class GetMain_chart_weekly(APIView):
+    serializer_class=GetProfile_main_chart_
+    permission_classes = [IsAuthenticated]
+    def get(self,request):
+        profile=request.user.profile
+        clicks=Click_Referral.objects.filter(referral_link__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(click_count=Count('id'))
+        registrations  = Profile.objects.filter(recommended_by__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(register_count=Count('id'))
+        data = {}
+        for click in clicks:
+            date = click['created_at__date']
+            data[date] = {'clicks': click['click_count'], 'registrations': 0}
+
+        for registration in registrations:
+            date = registration['created_at__date']
+            if date in data:
+                data[date]['registrations'] = registration['register_count']
+            else:
+                data[date] = {'clicks': 0, 'registrations': registration['register_count']}
+
+        # Convert to list of dictionaries for serialization
+        queryset = [
+            {
+                'created_at__date': date,
+                'clicks': values['clicks'],
+                'register_count': values['registrations']
+            }
+            for date, values in data.items()
+        ]
+        serializer = self.serializer_class(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class GetMain_chart_monthly(APIView):
+    serializer_class = GetProfile_main_chart_
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile = request.user.profile
+        clicks = Click_Referral.objects.filter(referral_link__profile=profile,
+                                               created_at__gte=timezone.now() - timedelta(days=29)).values(
+            'created_at__date').annotate(click_count=Count('id'))
+        registrations = Profile.objects.filter(recommended_by__profile=profile,
+                                               created_at__gte=timezone.now() - timedelta(days=29)).values(
+            'created_at__date').annotate(register_count=Count('id'))
+        data = {}
+        for click in clicks:
+            date = click['created_at__date']
+            data[date] = {'clicks': click['click_count'], 'registrations': 0}
+
+        for registration in registrations:
+            date = registration['created_at__date']
+            if date in data:
+                data[date]['registrations'] = registration['register_count']
+            else:
+                data[date] = {'clicks': 0, 'registrations': registration['register_count']}
+
+        # Convert to list of dictionaries for serialization
+        queryset = [
+            {
+                'created_at__date': date,
+                'clicks': values['clicks'],
+                'register_count': values['registrations']
+            }
+            for date, values in data.items()
+        ]
+        serializer = self.serializer_class(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 

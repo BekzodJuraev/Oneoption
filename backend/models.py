@@ -20,6 +20,10 @@ class Profile(Base):
     deposit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     recommended_by = models.ForeignKey('Referral', on_delete=models.CASCADE, related_name='recommended_profiles', null=True, blank=True)
     level=models.IntegerField(default=1)
+    total_income=models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    income_oborot = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    income_doxod = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
 
     photo = models.ImageField()
 

@@ -1,8 +1,9 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
-from drf_yasg.utils import swagger_auto_schema
+from django.db import connection
 
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
 from datetime import date, timedelta, datetime
@@ -16,7 +17,7 @@ from django.http import HttpResponse
 from django.db.models import Sum,Q,Count,F,Max,Prefetch
 from .models import PasswordReset,Profile,Referral,Click_Referral
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -480,6 +481,19 @@ class GetMain_chart_monthly(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class Profile_balance(APIView):
+    serializer_class = GetProfile_balance
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: GetProfile_balance()}
+    )
+    def get(self,request):
+        profile=Profile.objects.filter(username=request.user).values('total_income','income_oborot','income_doxod').first()
+
+        serializer = self.serializer_class(profile)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 

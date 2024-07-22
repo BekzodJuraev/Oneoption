@@ -270,3 +270,12 @@ def test_main_chart_monthly(test_count_link,test_register_refer,test_login,api):
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
 
+
+@pytest.mark.django_db
+def test_profile_balance(test_login,api):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url =reverse('profile_balance')
+    response= api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK

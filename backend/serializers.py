@@ -3,6 +3,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral
 
+class GetProfile_balance(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['total_income', 'income_oborot', 'income_doxod']
 
 class GetProfile_main_chart_(serializers.Serializer):
     clicks=serializers.IntegerField()

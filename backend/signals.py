@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from .models import Profile,Referral
+from .models import Profile,Referral,FTD
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
 
@@ -12,3 +12,12 @@ def create_profile_for_user(sender,instance,created,*args,**kwargs):
         Referral.objects.create(profile=instance, referral_type='doxod')
         Referral.objects.create(profile=instance, referral_type='oborot')
         Referral.objects.create(profile=instance, referral_type='sub')
+    if instance.recommended_by and hasattr(instance.recommended_by, 'profile'):
+        try:
+            FTD.objects.get(profile=instance)
+        except FTD.DoesNotExist:
+            FTD.objects.create(
+                profile=instance,
+                recommended_by=instance.recommended_by.profile,
+                ftd=instance.deposit
+            )

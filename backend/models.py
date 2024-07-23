@@ -25,6 +25,7 @@ class Profile(Base):
     income_doxod = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 
+
     photo = models.ImageField()
 
 
@@ -64,6 +65,16 @@ class Click_Referral(Base):
 
     def __str__(self):
         return self.referral_link.referral_type
+
+
+class FTD(Base):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='FTD')
+    recommended_by=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='rec')
+    ftd=models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def __str__(self):
+        return self.profile.email
+
 
 
 

@@ -20,3 +20,23 @@ def create_profile_for_user(sender,instance,created,*args,**kwargs):
                 'ftd': instance.deposit
             }
         )
+
+        ftd=FTD.objects.filter(recommended_by=instance.recommended_by.profile).count()
+        profile=instance.recommended_by.profile
+        new_level = profile.level
+
+        if ftd > 299:
+            new_level = 5
+        elif ftd > 199:
+            new_level = 4
+        elif ftd > 99:
+            new_level = 3
+        elif ftd > 49:
+            new_level = 2
+
+
+        if new_level != profile.level:
+            profile.level = new_level
+            profile.save()
+
+

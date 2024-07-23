@@ -69,7 +69,7 @@ class Click_Referral(Base):
 
 class FTD(Base):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='FTD')
-    recommended_by=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='rec')
+    recommended_by=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='recommended')
     ftd=models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):

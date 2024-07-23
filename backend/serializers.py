@@ -11,16 +11,20 @@ class GetProfile_balance(serializers.ModelSerializer):
 class GetProfile_main_chart_(serializers.Serializer):
     clicks=serializers.IntegerField()
     register_count=serializers.IntegerField()
+    ftd_count = serializers.IntegerField()
     day=serializers.DateField(source='created_at__date')
 class GetProfile_main_chart(serializers.Serializer):
     clicks=serializers.IntegerField()
     register_count=serializers.IntegerField()
+    ftd_count=serializers.IntegerField()
 class GetProfile_main(serializers.ModelSerializer):
     all_click=serializers.IntegerField()
     register_count=serializers.IntegerField()
+    ftd_count=serializers.IntegerField()
+    ftd_sum=serializers.DecimalField(max_digits=10, decimal_places=2)
     class Meta:
         model=Profile
-        fields=['all_click','register_count','deposit']
+        fields=['all_click','register_count','deposit','ftd_count','ftd_sum']
 class Refferal_count_all_(serializers.Serializer):
     count=serializers.IntegerField()
     day=serializers.DateField(source='created_at__date')

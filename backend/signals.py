@@ -12,7 +12,7 @@ def create_profile_for_user(sender,instance,created,*args,**kwargs):
         Referral.objects.create(profile=instance, referral_type='doxod')
         Referral.objects.create(profile=instance, referral_type='oborot')
         Referral.objects.create(profile=instance, referral_type='sub')
-    if instance.recommended_by and hasattr(instance.recommended_by, 'profile'):
+    if instance.recommended_by and hasattr(instance.recommended_by, 'profile') and instance.deposit > 0:
         try:
             FTD.objects.get(profile=instance)
         except FTD.DoesNotExist:

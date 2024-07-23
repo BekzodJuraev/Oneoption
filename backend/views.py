@@ -15,7 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.db.models import Sum,Q,Count,F,Max,Prefetch
-from .models import PasswordReset,Profile,Referral,Click_Referral
+from .models import PasswordReset,Profile,Referral,Click_Referral,FTD
 from .serializers import  \
     Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance
 from rest_framework.response import Response
@@ -375,11 +375,19 @@ class GetMain(APIView):
         profile = request.user.profile
         click_all=Click_Referral.objects.filter(referral_link__profile=profile).count()
         register_count=Profile.objects.filter(recommended_by__profile=profile).count()
+        ftd=FTD.objects.filter(recommended_by=profile).aggregate(ftd_sum=Sum('ftd'),count=Count('id'))
+
+
+
+
+
 
         queryset={
             "all_click":click_all,
             "register_count":register_count,
-            "deposit":profile.deposit
+            "deposit":profile.deposit,
+            'ftd_count':ftd['count'],
+            'ftd_sum':ftd['ftd_sum'] or 0
         }
         serializer = self.serializer_class(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -396,9 +404,11 @@ class GetMain_chart_daily(APIView):
         profile=reqeust.user.profile
         clicks=Click_Referral.objects.filter(referral_link__profile=profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
         register_count = Profile.objects.filter(recommended_by__profile=profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
+        ftd_count=FTD.objects.filter(recommended_by=profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
         queryset = {
             "clicks": clicks,
             "register_count": register_count,
+            "ftd_count":ftd_count
         }
         serializer = self.serializer_class(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -413,24 +423,33 @@ class GetMain_chart_weekly(APIView):
         profile=request.user.profile
         clicks=Click_Referral.objects.filter(referral_link__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(click_count=Count('id'))
         registrations  = Profile.objects.filter(recommended_by__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(register_count=Count('id'))
+        ftd_count = FTD.objects.filter(recommended_by=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(ftd_count=Count('id'))
         data = {}
         for click in clicks:
             date = click['created_at__date']
-            data[date] = {'clicks': click['click_count'], 'registrations': 0}
+            data[date] = {'clicks': click['click_count'], 'registrations': 0,'ftd_count':0}
 
         for registration in registrations:
             date = registration['created_at__date']
             if date in data:
                 data[date]['registrations'] = registration['register_count']
             else:
-                data[date] = {'clicks': 0, 'registrations': registration['register_count']}
+                data[date] = {'clicks': 0, 'registrations': registration['register_count'],'ftd_count':0}
 
-        # Convert to list of dictionaries for serialization
+        for ftd in ftd_count:
+            date = ftd['created_at__date']
+            if date in data:
+                data[date]['ftd_count'] = ftd['ftd_count']
+            else:
+                data[date] = {'clicks': 0, 'registrations': 0, 'ftd_count': ftd['ftd_count']}
+
+
         queryset = [
             {
                 'created_at__date': date,
                 'clicks': values['clicks'],
-                'register_count': values['registrations']
+                'register_count': values['registrations'],
+                'ftd_count':values['ftd_count']
             }
             for date, values in data.items()
         ]
@@ -456,24 +475,37 @@ class GetMain_chart_monthly(APIView):
         registrations = Profile.objects.filter(recommended_by__profile=profile,
                                                created_at__gte=timezone.now() - timedelta(days=29)).values(
             'created_at__date').annotate(register_count=Count('id'))
+        ftd_count = FTD.objects.filter(recommended_by=profile,
+                                       created_at__gte=timezone.now() - timedelta(days=29)).values(
+            'created_at__date').annotate(ftd_count=Count('id'))
         data = {}
         for click in clicks:
             date = click['created_at__date']
-            data[date] = {'clicks': click['click_count'], 'registrations': 0}
+            data[date] = {'clicks': click['click_count'], 'registrations': 0, 'ftd_count': 0}
 
         for registration in registrations:
             date = registration['created_at__date']
             if date in data:
                 data[date]['registrations'] = registration['register_count']
             else:
-                data[date] = {'clicks': 0, 'registrations': registration['register_count']}
+                data[date] = {'clicks': 0, 'registrations': registration['register_count'], 'ftd_count': 0}
+
+        for ftd in ftd_count:
+            date = ftd['created_at__date']
+            if date in data:
+                data[date]['ftd_count'] = ftd['ftd_count']
+            else:
+                data[date] = {'clicks': 0, 'registrations': 0, 'ftd_count': ftd['ftd_count']}
+
+
 
         # Convert to list of dictionaries for serialization
         queryset = [
             {
                 'created_at__date': date,
                 'clicks': values['clicks'],
-                'register_count': values['registrations']
+                'register_count': values['registrations'],
+                'ftd_count': values['ftd_count']
             }
             for date, values in data.items()
         ]

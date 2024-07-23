@@ -142,7 +142,8 @@ def test_register_refer(test_get_sub,api):
     response1 = api.post(url,data1)
     assert response.status_code == status.HTTP_201_CREATED
     profile=Profile.objects.get(email="pow@gmail.com")
-    print(profile.recommended_by)
+    profile.deposit=100
+    profile.save()
     assert profile.recommended_by
 
 @pytest.mark.django_db
@@ -153,6 +154,28 @@ def test_list_get(test_register_refer,test_login,api):
     response = api.get(url)
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
+
+@pytest.mark.django_db
+def test_list_get_email(test_login,api):
+    token = test_login
+    email="powerzver98@gmail.com"
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = f'/referal/list?email={email}'
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_list_get_id(test_register_refer,test_login,api):
+    token = test_login
+    id = 2
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = f'/referal/list?id={id}'
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
 
 @pytest.fixture
 def test_count_link(test_get_sub,api):
@@ -176,26 +199,6 @@ def test_count_link(test_get_sub,api):
 
 
 
-@pytest.mark.django_db
-def test_list_get_email(test_login,api):
-    token = test_login
-    email="powerzver98@gmail.com"
-    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
-    url = f'/referal/list?email={email}'
-    response = api.get(url)
-    print(response.data)
-    assert response.status_code == status.HTTP_200_OK
-
-
-@pytest.mark.django_db
-def test_list_get_id(test_register_refer,test_login,api):
-    token = test_login
-    id = 2
-    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
-    url = f'/referal/list?id={id}'
-    response = api.get(url)
-    print(response.data)
-    assert response.status_code == status.HTTP_200_OK
 
 
 

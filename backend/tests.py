@@ -83,15 +83,6 @@ def test_photo(test_update_profile,api,photo):
     assert response.status_code == status.HTTP_200_OK
     return token
 
-@pytest.mark.django_db
-def test_profile(test_photo,api):
-    token = test_photo
-    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
-    url=reverse('profile')
-    response = api.get(url)
-    print(response.data)
-    assert response.status_code == status.HTTP_200_OK
-    assert response.data['email'] == "asda23sasf@gmail.com"
 
 @pytest.mark.django_db
 def test_get_doxod(test_login,api):
@@ -285,3 +276,13 @@ def test_profile_balance(test_login,api):
     response= api.get(url)
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
+
+@pytest.mark.django_db
+def test_profile(test_count_link,test_register_refer,test_photo,api):
+    token = test_photo
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url=reverse('profile')
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data['email'] == "asda23sasf@gmail.com"

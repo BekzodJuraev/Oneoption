@@ -14,7 +14,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
-from django.db.models import Sum,Q,Count,F,Max,Prefetch
+from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD
 from .serializers import  \
     Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance
@@ -234,7 +234,12 @@ class Profile_View(APIView):
         responses={status.HTTP_200_OK: GetProfile()}
     )
     def get(self,request):
-        get_profile=self.get_profile()
+        ftd_count = FTD.objects.filter(recommended_by=self.get_profile()).count()
+        get_profile=Profile.objects.annotate(ftd_count=Value(ftd_count)).get(username=self.request.user)
+
+
+
+
         serializer = self.serializer_class(get_profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

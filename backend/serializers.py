@@ -43,10 +43,11 @@ class Refferal_Ser(serializers.ModelSerializer):
 
 
 class GetProfile(serializers.ModelSerializer):
+    ftd_count=serializers.IntegerField()
 
     class Meta:
         model=Profile
-        fields = ['first_name','last_name','email','photo','level']
+        fields = ['first_name','last_name','email','photo','level','ftd_count']
 
 class UpdateProfile(serializers.ModelSerializer):
     email=serializers.EmailField(required=False)

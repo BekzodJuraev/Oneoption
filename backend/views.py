@@ -235,7 +235,8 @@ class Profile_View(APIView):
     )
     def get(self,request):
         ftd_count = FTD.objects.filter(recommended_by=self.get_profile()).count()
-        get_profile=Profile.objects.annotate(ftd_count=Value(ftd_count)).get(username=self.request.user)
+        get_profile=Profile.objects.only('first_name','first_name','email','photo','level').annotate(ftd_count=Value(ftd_count)).get(username=request.user)
+
 
 
 

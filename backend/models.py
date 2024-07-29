@@ -19,10 +19,12 @@ class Profile(Base):
     email = models.EmailField()
     deposit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     recommended_by = models.ForeignKey('Referral', on_delete=models.CASCADE, related_name='recommended_profiles', null=True, blank=True)
+    withdraw=models.DecimalField(max_digits=10,decimal_places=2,default=0)
     level=models.IntegerField(default=1)
     total_income=models.DecimalField(max_digits=10, decimal_places=2, default=0)
     income_oborot = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     income_doxod = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
 
 
 
@@ -36,6 +38,14 @@ class Profile(Base):
             self.username.email = self.email
             self.username.save(update_fields=['email'])
 
+
+
+        if self.pk:
+            current_instance=Profile.objects.get(pk=self.pk)
+            if current_instance.deposit > self.deposit:
+                amout=current_instance.deposit - self.deposit
+
+                self.withdraw += amout
 
         super().save(*args, **kwargs)
 

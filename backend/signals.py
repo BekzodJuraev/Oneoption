@@ -40,3 +40,5 @@ def create_profile_for_user(sender,instance,created,*args,**kwargs):
             profile.save()
 
 
+
+

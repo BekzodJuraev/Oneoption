@@ -382,6 +382,7 @@ class GetMain(APIView):
         click_all=Click_Referral.objects.filter(referral_link__profile=profile).count()
         register_count=Profile.objects.filter(recommended_by__profile=profile).count()
         ftd=FTD.objects.filter(recommended_by=profile).aggregate(ftd_sum=Sum('ftd'),count=Count('id'))
+        witdraw_ref=Profile.objects.filter(recommended_by__profile=profile).aggregate(witdraw_ref=Sum('withdraw'))['witdraw_ref']
 
 
 
@@ -393,7 +394,8 @@ class GetMain(APIView):
             "register_count":register_count,
             "deposit":profile.deposit,
             'ftd_count':ftd['count'],
-            'ftd_sum':ftd['ftd_sum'] or 0
+            'ftd_sum':ftd['ftd_sum'] or 0,
+            'witdraw_ref':witdraw_ref or 0
         }
         serializer = self.serializer_class(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)

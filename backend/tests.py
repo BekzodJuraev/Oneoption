@@ -135,13 +135,13 @@ def test_register_refer(test_get_sub,api):
     profile=Profile.objects.get(email="pow@gmail.com")
     profile.deposit=100
     profile.save()
-    profile.deposit = 30
+    profile.deposit -=50
+    profile.withdraw += 50
     profile.save()
     profile2 = Profile.objects.get(email="powerzver98@gmail.com")
     profile2.deposit = 100
     profile2.save()
-    profile2.deposit = 50
-    profile2.save()
+
     assert profile.recommended_by
 
 @pytest.mark.django_db

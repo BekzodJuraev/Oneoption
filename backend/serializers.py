@@ -23,9 +23,10 @@ class GetProfile_main(serializers.ModelSerializer):
     ftd_count=serializers.IntegerField()
     ftd_sum=serializers.DecimalField(max_digits=10, decimal_places=2)
     witdraw_ref=serializers.DecimalField(max_digits=10, decimal_places=2)
+    oborot=serializers.DecimalField(max_digits=10, decimal_places=2)
     class Meta:
         model=Profile
-        fields=['all_click','register_count','deposit','ftd_count','ftd_sum','witdraw_ref']
+        fields=['all_click','register_count','deposit','ftd_count','ftd_sum','witdraw_ref','oborot']
 class Refferal_count_all_(serializers.Serializer):
     count=serializers.IntegerField()
     day=serializers.DateField(source='created_at__date')

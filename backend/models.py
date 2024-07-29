@@ -24,7 +24,7 @@ class Profile(Base):
     total_income=models.DecimalField(max_digits=10, decimal_places=2, default=0)
     income_oborot = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     income_doxod = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
+    total=models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 
 
@@ -40,12 +40,17 @@ class Profile(Base):
 
 
 
-        if self.pk:
-            current_instance=Profile.objects.get(pk=self.pk)
-            if current_instance.deposit > self.deposit:
-                amout=current_instance.deposit - self.deposit
+        # if self.pk:
+        #     current_instance=Profile.objects.get(pk=self.pk)
+        #     if current_instance.deposit > self.deposit:
+        #         amout=current_instance.deposit - self.deposit
+        #
+        #         self.withdraw += amout
 
-                self.withdraw += amout
+        #self.total += self.deposit
+
+
+
 
         super().save(*args, **kwargs)
 

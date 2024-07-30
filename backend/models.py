@@ -48,7 +48,7 @@ class Profile(Base):
         #         self.withdraw += amout
 
         #self.total += self.deposit
-
+        self.total_income= self.income_oborot + self.income_doxod
 
 
 

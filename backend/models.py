@@ -28,6 +28,8 @@ class Profile(Base):
 
 
 
+
+
     photo = models.ImageField()
 
 

@@ -2,7 +2,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.db import connection
-
+from django.db import models
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
@@ -282,6 +282,7 @@ class GetRefraldoxod(APIView):
 
 
 class GetRefraloborot(APIView):
+
     authentication_classes = [TokenAuthentication]
     serializer_class = Refferal_Ser
     permission_classes = [IsAuthenticated, ]
@@ -539,4 +540,5 @@ class Profile_balance(APIView):
 
 
 def index(request):
+    #user=UserProfile.objects.all()
     return render(request,'google.html')

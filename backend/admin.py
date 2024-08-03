@@ -1,6 +1,9 @@
 from django.contrib import admin
 from .models import Profile,PasswordReset,Referral,Click_Referral,FTD
 
+
+
+
 @admin.register(FTD)
 class FTDadmin(admin.ModelAdmin):
     list_display = ['profile','ftd']

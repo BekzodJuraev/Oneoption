@@ -10,7 +10,7 @@ class UserProfile(models.Model):
     currency = models.TextField(blank=True, null=True)
     image = models.CharField(max_length=200, blank=True, null=True)
     user = models.ForeignKey("User", models.DO_NOTHING)
-    ref = models.ForeignKey(Referral, on_delete=models.CASCADE, related_name='ref', null=True, blank=True)
+    #ref = models.ForeignKey(Referral, on_delete=models.CASCADE, related_name='ref', null=True, blank=True)
 
 
 

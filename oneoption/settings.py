@@ -99,16 +99,16 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-    'secondary': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'one_option',
-        'USER': 'new_user',
-        'PASSWORD': 'password',
-        'HOST': '86.48.7.247',  # e.g., 'localhost' or 'db.example.com'
-        'PORT': '5432',  # e.g., '5432' (default)
-    }
+    # 'secondary': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'one_option',
+    #     'USER': 'new_user',
+    #     'PASSWORD': 'password',
+    #     'HOST': '86.48.7.247',  # e.g., 'localhost' or 'db.example.com'
+    #     'PORT': '5432',  # e.g., '5432' (default)
+    # }
 }
-DATABASE_ROUTERS = ['broker.db_route.SecondaryDatabaseRouter']
+#DATABASE_ROUTERS = ['broker.db_route.SecondaryDatabaseRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -25,6 +25,8 @@ urlpatterns=[
     path('referal/count/weekly',views.Referall_count_weekly.as_view(),name='ref_weekly'),
     path('referal/count/monthly',views.Referall_count_monthly.as_view(),name='ref_monthly'),
     path('wallet/list',views.GetWallet.as_view(),name='wallet_list'),
+    path('wallet/',views.GetWalletType.as_view(),name='wallet'),
+
     path('asd/',views.index,name='asd')
 
 ]

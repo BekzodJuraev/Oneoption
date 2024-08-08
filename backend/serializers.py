@@ -3,6 +3,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral,Wallet,Wallet_Type
 
+
+class GetWallet_type(serializers.ModelSerializer):
+    class Meta:
+        model=Wallet_Type
+        fields=['id','name']
 class GetWalletSer(serializers.ModelSerializer):
     class Meta:
         model=Wallet

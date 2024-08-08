@@ -15,9 +15,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
-from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet
+from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWalletSer
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWalletSer,GetWallet_type
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -546,6 +546,23 @@ class GetWallet(APIView):
         query=Wallet.objects.filter(profile=request.user.profile)
         serializer = self.serializer_class(query,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+class GetWalletType(APIView):
+    serializer_class=GetWallet_type
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request):
+        query = Wallet_Type.objects.all()
+        serializer = self.serializer_class(query, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self,request):
+        pass
+
+
+
 
 def index(request):
     #user=UserProfile.objects.all()

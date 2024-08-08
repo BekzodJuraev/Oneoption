@@ -1,8 +1,13 @@
 from django.contrib import admin
-from .models import Profile,PasswordReset,Referral,Click_Referral,FTD
+from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet
 
 
-
+@admin.register(Wallet_Type)
+class Wallet_Type(admin.ModelAdmin):
+    pass
+@admin.register(Wallet)
+class Wallet(admin.ModelAdmin):
+    pass
 
 @admin.register(FTD)
 class FTDadmin(admin.ModelAdmin):

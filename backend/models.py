@@ -25,11 +25,6 @@ class Profile(Base):
     income_oborot = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     income_doxod = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total=models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-
-
-
-
     photo = models.ImageField()
 
 
@@ -96,6 +91,18 @@ class FTD(Base):
 
 
 
+class Wallet(Base):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='wallet')
+    type_wallet=models.ForeignKey("Wallet_Type", on_delete=models.CASCADE)
+    wallet_id=models.CharField(max_length=100)
 
 
+    def __str__(self):
+        return  self.type_wallet.name
+
+
+class Wallet_Type(Base):
+    name=models.CharField(max_length=250)
+    def __str__(self):
+        return  self.name
 

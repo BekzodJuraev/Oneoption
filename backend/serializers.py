@@ -1,7 +1,14 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Profile,Referral
+from .models import Profile,Referral,Wallet,Wallet_Type
+
+class GetWalletSer(serializers.ModelSerializer):
+    class Meta:
+        model=Wallet
+        fields=['type_wallet','wallet_id']
+
+
 
 class GetProfile_balance(serializers.ModelSerializer):
     class Meta:

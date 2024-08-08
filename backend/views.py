@@ -15,9 +15,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
-from .models import PasswordReset,Profile,Referral,Click_Referral,FTD
+from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWalletSer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -538,6 +538,14 @@ class Profile_balance(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class GetWallet(APIView):
+    serializer_class = GetWalletSer
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request):
+        query=Wallet.objects.filter(profile=request.user.profile)
+        serializer = self.serializer_class(query,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 def index(request):
     #user=UserProfile.objects.all()

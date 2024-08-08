@@ -5,7 +5,7 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from PIL import Image
 import io
-from backend.models import Profile,Click_Referral
+from backend.models import Profile,Click_Referral,Wallet_Type,Wallet
 
 from django.utils import timezone
 from datetime import timedelta
@@ -290,3 +290,28 @@ def test_profile(test_count_link,test_register_refer,test_photo,api):
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
     assert response.data['email'] == "asda23sasf@gmail.com"
+
+@pytest.fixture
+def create_typewallet():
+    a, _ = Wallet_Type.objects.get_or_create(name="Bitcoin")
+    b, _ = Wallet_Type.objects.get_or_create(name="USDT2")
+
+    profile = Profile.objects.get(email='asda23sasf@gmail.com')
+
+    wallet1 = Wallet.objects.create(profile=profile, type_wallet=a, wallet_id="123")
+    wallet2 = Wallet.objects.create(profile=profile, type_wallet=b, wallet_id="1234")
+
+    return wallet1, wallet2
+
+
+
+
+@pytest.mark.django_db
+def test_wallet_list(api,test_login,create_typewallet):
+    token=test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('wallet_list')
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+

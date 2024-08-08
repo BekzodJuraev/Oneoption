@@ -312,6 +312,6 @@ def test_wallet_list(api,test_login,create_typewallet):
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url = reverse('wallet_list')
     response = api.get(url)
-    print(response.data)
+    #print(response.data)
     assert response.status_code == status.HTTP_200_OK
 

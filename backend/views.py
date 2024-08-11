@@ -17,7 +17,7 @@ from django.http import HttpResponse
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWalletSer,GetWallet_type
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -539,7 +539,7 @@ class Profile_balance(APIView):
 
 
 class GetWallet(APIView):
-    serializer_class = GetWalletSer
+    serializer_class = WalletPOST
     permission_classes = [IsAuthenticated]
 
     def get(self,request):
@@ -559,7 +559,11 @@ class GetWalletType(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self,request):
-        pass
+        serializer=WalletPOST(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(profile=request.user.profile)
+        return Response({'detail': 'Added Wallet','data':serializer.data}, status=status.HTTP_201_CREATED)
+
 
 
 

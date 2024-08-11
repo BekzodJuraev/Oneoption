@@ -4,14 +4,30 @@ from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral,Wallet,Wallet_Type
 
 
+class WalletPOST(serializers.ModelSerializer):
+    type_wallet = serializers.SlugRelatedField(
+        queryset=Wallet_Type.objects.all(),
+        slug_field='name'
+    )
+
+    class Meta:
+        model = Wallet
+        fields = ['type_wallet', 'wallet_id']
+
+
+    def create(self, validated_data):
+        profile = validated_data.pop('profile')
+
+        wallet = Wallet.objects.create(profile=profile, **validated_data)
+        print(wallet)
+        return wallet
+
+
 class GetWallet_type(serializers.ModelSerializer):
     class Meta:
         model=Wallet_Type
-        fields=['id','name']
-class GetWalletSer(serializers.ModelSerializer):
-    class Meta:
-        model=Wallet
-        fields=['type_wallet','wallet_id']
+        fields=['name']
+
 
 
 

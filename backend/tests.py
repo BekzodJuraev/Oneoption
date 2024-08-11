@@ -296,22 +296,48 @@ def create_typewallet():
     a, _ = Wallet_Type.objects.get_or_create(name="Bitcoin")
     b, _ = Wallet_Type.objects.get_or_create(name="USDT2")
 
-    profile = Profile.objects.get(email='asda23sasf@gmail.com')
+    # profile = Profile.objects.get(email='asda23sasf@gmail.com')
+    #
+    # wallet1 = Wallet.objects.create(profile=profile, type_wallet=a, wallet_id="123")
+    # wallet2 = Wallet.objects.create(profile=profile, type_wallet=b, wallet_id="1234")
 
-    wallet1 = Wallet.objects.create(profile=profile, type_wallet=a, wallet_id="123")
-    wallet2 = Wallet.objects.create(profile=profile, type_wallet=b, wallet_id="1234")
-
-    return wallet1, wallet2
-
-
+    return a, b
 
 
 @pytest.mark.django_db
-def test_wallet_list(api,test_login,create_typewallet):
+def test_wallet_get(api,test_login,create_typewallet):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('wallet')
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK
+
+@pytest.fixture
+def test_wallet_post(api,test_login,create_typewallet):
+    token = test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('wallet')
+    payload={
+        'type_wallet':'Bitcoin',
+        'wallet_id':'123456'
+    }
+    response = api.post(url,payload)
+    payload1 = {
+        'type_wallet': 'USDT2',
+        'wallet_id': '123456'
+    }
+    response1 = api.post(url, payload1)
+    print(response.data)
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+@pytest.mark.django_db
+def test_wallet_list(api,test_login,test_wallet_post):
     token=test_login
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url = reverse('wallet_list')
     response = api.get(url)
-    #print(response.data)
+    print(response.data)
     assert response.status_code == status.HTTP_200_OK
 

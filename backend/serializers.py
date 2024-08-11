@@ -4,6 +4,12 @@ from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral,Wallet,Wallet_Type
 
 
+
+class WithdrawSer(serializers.Serializer):
+    wallet=serializers.CharField(source='type_wallet__name')
+
+
+
 class WalletPOST(serializers.ModelSerializer):
     type_wallet = serializers.SlugRelatedField(
         queryset=Wallet_Type.objects.all(),
@@ -17,9 +23,7 @@ class WalletPOST(serializers.ModelSerializer):
 
     def create(self, validated_data):
         profile = validated_data.pop('profile')
-
         wallet = Wallet.objects.create(profile=profile, **validated_data)
-        print(wallet)
         return wallet
 
 

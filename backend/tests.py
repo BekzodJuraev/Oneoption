@@ -341,3 +341,13 @@ def test_wallet_list(api,test_login,test_wallet_post):
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
 
+
+
+@pytest.mark.django_db
+def test_withdraw_get(api,test_login,test_wallet_post):
+    token=test_login
+    api.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    url = reverse('withdraw')
+    response = api.get(url)
+    print(response.data)
+    assert response.status_code == status.HTTP_200_OK

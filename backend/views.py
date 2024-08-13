@@ -175,13 +175,9 @@ class RequestPasswordReset(APIView):
         token = token_generator.make_token(user)
         reset = PasswordReset(email=email, token=token)
         reset.save()
-        #send_email()
+        send_email()
 
-        #reset_url = f"{os.environ['PASSWORD_RESET_BASE_URL']}/{token}"
-          # For debugging purposes; remove or use a proper logging system in production
 
-        # Sending reset link via email (commented out for clarity)
-        # ... (email sending code)
 
         return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
 

@@ -168,6 +168,11 @@ SOCIAL_AUTH_LOGIN_ERROR_URL = '/'
 
 STATIC_ROOT=os.path.join(BASE_DIR,'static')
 
+MEDIA_URL = ''
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+
+
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -185,3 +190,9 @@ CORS_ALLOW_HEADERS = [
     'content-type',
     'authorization',
 ]
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your_email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_email_password'

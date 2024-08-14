@@ -1,0 +1,1 @@
+export { RecoverPasswordConfirmPage } from "./page";

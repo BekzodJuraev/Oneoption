@@ -1,0 +1,1 @@
+export { RecoverPasswordPage } from "./page";

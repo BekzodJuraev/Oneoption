@@ -1,0 +1,1 @@
+export { GoogleAuthenticationPage } from "./page";

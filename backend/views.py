@@ -175,7 +175,14 @@ class RequestPasswordReset(APIView):
         token = token_generator.make_token(user)
         reset = PasswordReset(email=email, token=token)
         reset.save()
-        send_email()
+        send=f"https://affilate.oneoption.ru/password_reset/{token}/"
+        send_mail(
+            'Password reset',
+            f'Recovery link {send}',
+            'bekawhy2705@gmail.com',
+            [email],
+            fail_silently=False,
+        )
 
 
 
@@ -197,11 +204,14 @@ class PasswordResetConfirm(APIView):
         serializer = self.serializer_class(data=request.data)
 
         reset_obj = PasswordReset.objects.filter(token=token).first()
-
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        if reset_obj is None:
+            return Response({"error": "Invalid token or reset object not found"}, status=status.HTTP_404_NOT_FOUND)
+
         try:
+
             user = User.objects.get(email=reset_obj.email)
         except User.DoesNotExist:
             return Response({"error": "Invalid token or user does not exist"}, status=status.HTTP_404_NOT_FOUND)

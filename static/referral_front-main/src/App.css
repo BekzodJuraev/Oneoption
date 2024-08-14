@@ -1,0 +1,102 @@
+@font-face {
+    font-family: "GetVoIP Grotesque";
+    src: url("@/assets/fonts/GetVoIP Grotesque.otf") format("opentype");
+}
+
+img,
+svg {
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+    font-style: italic;
+    background-repeat: no-repeat;
+    background-size: cover;
+    shape-margin: 0.75rem;
+}
+
+form {
+    @apply grid gap-y-4;
+}
+
+label {
+    @apply grid h-max gap-y-2;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1.5rem;
+
+    height: 100%;
+    margin-inline: auto;
+    font-family: GetVoIP Grotesque;
+}
+
+.sign-in {
+    position: relative;
+    isolation: isolate;
+    padding-inline-start: 1rem;
+    padding-inline-end: 2.5rem;
+
+    clip-path: xywh(0 0 100% 100% round 0.5rem 0 0 0.5rem);
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0 16px 0 -25px;
+        background: transparent;
+        z-index: -1;
+        transform: skew(35deg);
+        border-radius: 0 0.5rem 1.5rem 0;
+        border: 2px solid white;
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-left: 2px solid white;
+        border-top: 2px solid white;
+        border-bottom: 2px solid white;
+        clip-path: polygon(0 0, 12px 0, 12px 100%, 0 100%);
+        border-radius: 0.5rem;
+    }
+}
+
+.sign-up {
+    position: relative;
+    isolation: isolate;
+    padding-inline-start: 2.5rem;
+    padding-inline-end: 1rem;
+
+    clip-path: border-box xywh(0 0 100% 100% round 0 0.5rem 0.5rem 0);
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0 -25px 0 16px;
+        background: transparent;
+        z-index: -1;
+        transform: skew(35deg);
+        border-radius: 1.5rem 0 0 0.5rem;
+        border: 2px solid #793aff;
+        background-color: #793aff;
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-right: 2px solid #793aff;
+        border-top: 2px solid #793aff;
+        border-bottom: 2px solid #793aff;
+        clip-path: polygon(
+            calc(100% - 8px) 0,
+            100% 0,
+            100% 100%,
+            calc(100% - 8px) 100%
+        );
+
+        border-radius: 0.5rem;
+    }
+}

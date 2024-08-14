@@ -1,0 +1,11 @@
+export { CashOutIcon } from "./cash-out-icon";
+export { DashboardIcon } from "./dashboard-icon";
+export { ExitIcon } from "./exit-icon";
+export { NotificationIcon } from "./notification-icon";
+export { PartnershipAgreementIcon } from "./partnership-agreement-icon";
+export { ProfileIcon } from "./profile-icon";
+export { ReferralProgramIcon } from "./referral-program-icon";
+export { StatisticIcon } from "./statistic-icon";
+export { SubReferralProgramIcon } from "./sub-referral-program-icon";
+export { SupportIcon } from "./support-icon";
+export { TelegramIcon } from "./telegram-icon";

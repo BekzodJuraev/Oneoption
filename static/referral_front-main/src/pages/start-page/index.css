@@ -1,0 +1,150 @@
+/* body {
+    background: url("@/assets/bg.webp") center/cover no-repeat;
+} */
+
+main > .header {
+    /* min-height: 100dvh; */
+    background: url("@/assets/bg.webp") center/cover no-repeat;
+    /* min-height: 100svh; */
+    /* height: 100svh; */
+    /* height: min(100%, 100svh); */
+    /* max-height: 100svh; */
+    color: #fef7ff;
+
+    /* max-height: 100dvh; */
+    /* height: 100%; */
+    /* max-height: 100dvh; */
+    & > div {
+        min-height: 100svh;
+    }
+}
+/* :not(section) > header {
+    height: 100%;
+    min-height: 100dvh;
+} */
+
+.section > div {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    row-gap: 1.25rem;
+
+    /* height: 100lvh; */
+    min-height: 100lvh;
+    place-items: center;
+    background: #121213;
+    /* max-height: 100lvh; */
+
+    /* padding-inline: 1.25rem; */
+    padding-block: 2rem;
+
+    & header {
+        /* order: 2; */
+
+        padding-inline: 1.25rem;
+        padding-block: 1.5rem;
+        background: linear-gradient(180deg, #793aff 0%, #492399 100%);
+        border-radius: 0.75rem;
+
+        font-size: 1.375rem;
+        box-shadow: 0 4px 15px 0 #652cde;
+        color: #fef7ff;
+
+        & h2 {
+            font-size: 1em;
+        }
+
+        & p {
+            font-size: 0.75em;
+            font-family: Jost;
+        }
+
+        & > div {
+            margin-top: 0.75em;
+
+            & * + * {
+                margin-top: 0.5em;
+            }
+        }
+    }
+
+    & > figure {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* order: 1; */
+        width: 100%;
+        height: 100%;
+        padding-inline: 3rem;
+
+        background:
+            url("data:image/svg+xml,%3Csvg width='987' height='1092' viewBox='0 0 987 1092' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg filter='url(%23filter0_f_243_3577)'%3E%3Ccircle cx='546' cy='546' r='246' fill='%23793AFF' fill-opacity='0.56' /%3E%3C/g%3E%3Cdefs%3E%3Cfilter id='filter0_f_243_3577' x='0' y='0' width='1092' height='1092' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix' /%3E%3CfeBlend mode='normal' in='SourceGraphic' in2='BackgroundImageFix' result='shape' /%3E%3CfeGaussianBlur stdDeviation='150' result='effect1_foregroundBlur_243_3577' /%3E%3C/filter%3E%3C/defs%3E%3C/svg%3E")
+                center/contain no-repeat,
+            url("data:image/svg+xml,%3Csvg width='989' height='1077' viewBox='0 0 989 1077' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg filter='url(%23filter0_f_243_3580)'%3E%3Cellipse cx='451' cy='538.5' rx='138' ry='138.5' fill='%23793AFF' fill-opacity='0.56' /%3E%3C/g%3E%3Cdefs%3E%3Cfilter id='filter0_f_243_3580' x='-87' y='0' width='1076' height='1077' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix' /%3E%3CfeBlend mode='normal' in='SourceGraphic' in2='BackgroundImageFix' result='shape' /%3E%3CfeGaussianBlur stdDeviation='200' result='effect1_foregroundBlur_243_3580' /%3E%3C/filter%3E%3C/defs%3E%3C/svg%3E")
+                center/contain no-repeat;
+
+        & svg,
+        img {
+            height: 100%;
+            max-height: 400px;
+            /* aspect-ratio: 16/9; */
+            /* object-fit: contain; */
+        }
+    }
+
+    & a {
+        display: block;
+
+        width: 100%;
+        height: 3.5rem;
+        padding-inline: 2rem;
+        margin-top: 2rem;
+
+        box-shadow: 0 4px 30px 0 #652cde;
+        background: #793aff;
+        border-radius: 12px;
+
+        font-size: 1.125rem;
+        text-align: center;
+        line-height: 3.5rem;
+    }
+}
+
+/* section:nth-of-type(even) header {
+    order: 2;
+} */
+
+/* @media (orientation: landscape) {
+    section > div {
+        height: auto;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        place-items: center;
+    }
+} */
+
+@media (min-width: 768px) {
+    .section > div {
+        height: auto;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+
+        & header {
+            font-size: clamp(1.5rem, 1.1rem + 1vw, 2rem);
+        }
+
+        & a {
+            margin-left: auto;
+
+            max-width: 340px;
+        }
+    }
+
+    .section:nth-of-type(odd) {
+        & header {
+            order: 1;
+        }
+
+        & figure {
+            order: 2;
+        }
+    }
+}

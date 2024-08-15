@@ -175,7 +175,7 @@ class RequestPasswordReset(APIView):
         token = token_generator.make_token(user)
         reset = PasswordReset(email=email, token=token)
         reset.save()
-        send=f"https://affilate.oneoption.ru/password_reset/{token}/"
+        send=f"https://localhost:5173/auth/password/reset/confirm/{token}/"
         send_mail(
             'Password reset',
             f'Recovery link {send}',
@@ -548,6 +548,13 @@ class GetWallet(APIView):
     serializer_class = WalletPOST
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: WalletPOST()}
+    )
+
+
+
+
     def get(self,request):
         query=Wallet.objects.filter(profile=request.user.profile)
         serializer = self.serializer_class(query,many=True)
@@ -559,11 +566,18 @@ class GetWalletType(APIView):
     serializer_class=GetWallet_type
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: GetWallet_type()}
+    )
+
     def get(self,request):
         query = Wallet_Type.objects.all()
         serializer = self.serializer_class(query, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: WalletPOST()}
+    )
     def post(self,request):
         serializer=WalletPOST(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -574,6 +588,9 @@ class Withdraw(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class=WithdrawSer
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: WithdrawSer()}
+    )
 
     def get(self,request):
         query=Wallet.objects.filter(profile=request.user.profile).values('type_wallet__name')

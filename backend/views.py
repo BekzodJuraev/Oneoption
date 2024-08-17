@@ -132,16 +132,18 @@ class SocialLoginComplete(APIView):
 
 
     def get(self,request):
+
         token = request.GET.get('token')
 
         if token:
-
             try:
                 token = Token.objects.get(key=token)
                 response_data = {'detail': 'Login successful via google', 'token': token.key}
                 return Response(response_data, status=status.HTTP_200_OK)
-            except:
-                return Response({'detail': 'Not finded token'}, status=status.HTTP_400_BAD_REQUEST)
+            except Token.DoesNotExist:
+                return Response({'detail': 'Token not found'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': 'Token parameter missing'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 

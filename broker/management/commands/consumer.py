@@ -12,7 +12,10 @@ class Command(BaseCommand):
             # Process the message here
 
         def start_consumer():
-            connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+            credentials = pika.PlainCredentials('root', '123')
+            parameters = pika.ConnectionParameters('86.48.7.247', 5672, '/', credentials)
+
+            connection = pika.BlockingConnection(parameters)
             channel = connection.channel()
 
             # Declare the queue from which the consumer will receive messages

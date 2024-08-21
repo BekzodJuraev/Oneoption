@@ -1,8 +1,10 @@
 import pika
 
 def publish_message(message):
-    # Establish a connection to RabbitMQ server
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    credentials = pika.PlainCredentials('root', '123')
+    parameters = pika.ConnectionParameters('86.48.7.247', 5672, '/', credentials)
+
+    connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 
     # Declare the queue to ensure it exists
@@ -18,5 +20,5 @@ def publish_message(message):
     connection.close()
 
 if __name__ == '__main__':
-    message = "GOOD BOY"
+    message = "sadasf"
     publish_message(message)

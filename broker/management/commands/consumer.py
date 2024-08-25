@@ -19,10 +19,10 @@ class Command(BaseCommand):
             channel = connection.channel()
 
             # Declare the queue from which the consumer will receive messages
-            channel.queue_declare(queue='my_queue')
+            channel.queue_declare(queue='user_registration',durable=True)
 
             channel.basic_consume(
-                queue='my_queue', on_message_callback=callback, auto_ack=True
+                queue='user_registration', on_message_callback=callback, auto_ack=True
             )
 
             print('Waiting for messages. To exit press CTRL+C')

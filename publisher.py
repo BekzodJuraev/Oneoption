@@ -8,11 +8,11 @@ def publish_message(message):
     channel = connection.channel()
 
     # Declare the queue to ensure it exists
-    channel.queue_declare(queue='my_queue')
+    channel.queue_declare(queue='user_registration')
 
     # Publish the message to the queue
     channel.basic_publish(exchange='',
-                          routing_key='my_queue',
+                          routing_key='user_registration',
                           body=message)
     print(f"Sent '{message}'")
 

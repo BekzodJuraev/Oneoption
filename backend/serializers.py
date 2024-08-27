@@ -143,15 +143,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
             email=validated_data['email'],
             password=validated_data['password'],
         )
-
+        nickname = user.email.split("@")[0]
         if code:
+
             try:
                 ref = Referral.objects.get(code=code)
-                Profile.objects.create(username=user, email=user.email, recommended_by=ref)
+                Profile.objects.create(username=user, email=user.email, nickname=nickname,recommended_by=ref)
             except Referral.DoesNotExist:
-                Profile.objects.create(username=user, email=user.email)
+                Profile.objects.create(username=user, email=user.email,nickname=nickname)
         else:
-            Profile.objects.create(username=user, email=user.email)
+            Profile.objects.create(username=user, email=user.email,nickname=nickname)
 
 
 

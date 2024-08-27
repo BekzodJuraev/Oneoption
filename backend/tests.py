@@ -286,6 +286,7 @@ def test_profile(test_count_link,test_register_refer,test_photo,api):
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url=reverse('profile')
     response = api.get(url)
+    print(response.data)
     assert response.status_code == status.HTTP_200_OK
     assert response.data['email'] == "asda23sasf@gmail.com"
 

@@ -28,7 +28,7 @@ def api():
 @pytest.fixture
 def test_register(api):
 
-    url = "https://c61e-84-54-72-66.ngrok-free.app/register/"
+    url = reverse('register')
     data={
     "email":"asda23sasf@gmail.com",
     "password": "12346789@@",
@@ -61,10 +61,10 @@ def test_update_profile(test_login,api):
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url = reverse('profile')
     payload={
-        "first_name":"Bekzod",
-        "last_name":"Juraev"
+        "nickname":"Bekawhy",
     }
     response=api.post(url,payload)
+    print(response.data)
     assert response.status_code == status.HTTP_200_OK
     assert response.data['message'] == 'Profile updated'
     return token
@@ -278,7 +278,6 @@ def test_profile_balance(test_login,api):
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url =reverse('profile_balance')
     response= api.get(url)
-    print(response.data)
     assert response.status_code == status.HTTP_200_OK
 
 @pytest.mark.django_db
@@ -287,7 +286,6 @@ def test_profile(test_count_link,test_register_refer,test_photo,api):
     api.credentials(HTTP_AUTHORIZATION='Token ' + token)
     url=reverse('profile')
     response = api.get(url)
-    print(response.data)
     assert response.status_code == status.HTTP_200_OK
     assert response.data['email'] == "asda23sasf@gmail.com"
 

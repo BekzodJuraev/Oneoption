@@ -81,13 +81,13 @@ class GetProfile(serializers.ModelSerializer):
 
     class Meta:
         model=Profile
-        fields = ['first_name','last_name','email','photo','level','ftd_count']
+        fields = ['nickname','email','photo','level','ftd_count']
 
 class UpdateProfile(serializers.ModelSerializer):
     email=serializers.EmailField(required=False)
     class Meta:
         model=Profile
-        fields = ['first_name','last_name','email']
+        fields = ['nickname','email']
 
 class SetPictures(serializers.ModelSerializer):
     class Meta:

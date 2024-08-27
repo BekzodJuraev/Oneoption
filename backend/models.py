@@ -14,8 +14,6 @@ class PasswordReset(Base):
 class Profile(Base):
     username=models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
     nickname = models.CharField(max_length=150)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=140)
     email = models.EmailField()
     deposit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     recommended_by = models.ForeignKey('Referral', on_delete=models.CASCADE, related_name='recommended_profiles', null=True, blank=True)

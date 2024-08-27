@@ -1,13 +1,24 @@
 from django.core.management.base import BaseCommand
 import pika
-
+from broker.models import Userbroker
+import json
 
 class Command(BaseCommand):
     help = 'Starts the RabbitMQ consumer to process messages'
 
     def handle(self, *args, **kwargs):
         def callback(ch, method, properties, body):
-            print(f"Received {body}")
+            message = json.loads(body)
+            email = message.get('email')
+            if email:
+                try:
+                    Userbroker.objects.create(email=email)
+                    print(f"Created Userbroker record with email: {email}")
+                except:
+                    print("user has")
+
+            else:
+                print("No email field found in message")
 
             # Process the message here
 

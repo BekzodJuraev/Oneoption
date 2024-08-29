@@ -14,6 +14,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
+from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type
 from .serializers import  \
@@ -346,11 +347,11 @@ class Referall_count_daily(APIView):
     permission_classes = [IsAuthenticated, ]
 
     @swagger_auto_schema(
-        responses={status.HTTP_200_OK: Refferal_count_all()}
+        responses={status.HTTP_200_OK: Refferal_count_all(many=True)}
     )
     def get(self,request):
-        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
-        serializer = self.serializer_class({"count": queryset})
+        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(hours=24)).annotate(hour=TruncHour('created_at')).values("hour").annotate(count=Count('id')).order_by('hour')
+        serializer = self.serializer_class(queryset,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -415,20 +416,61 @@ class GetMain_chart_daily(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        responses={status.HTTP_200_OK: GetProfile_main_chart()}
+        responses={status.HTTP_200_OK: GetProfile_main_chart(many=True)}
     )
 
     def get(self,reqeust):
         profile=reqeust.user.profile
-        clicks=Click_Referral.objects.filter(referral_link__profile=profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
-        register_count = Profile.objects.filter(recommended_by__profile=profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
-        ftd_count=FTD.objects.filter(recommended_by=profile,created_at__gte=timezone.now() - timedelta(hours=24)).count()
-        queryset = {
-            "clicks": clicks,
-            "register_count": register_count,
-            "ftd_count":ftd_count
-        }
-        serializer = self.serializer_class(queryset)
+        clicks = Click_Referral.objects.filter(
+            referral_link__profile=profile,
+            created_at__gte=timezone.now() - timedelta(hours=24)
+        ).annotate(hour=TruncHour('created_at')).values('hour').annotate(click_count=Count('id')).order_by('hour')
+
+        # Registrations, aggregated by hour for the past 24 hours
+        registrations = Profile.objects.filter(
+            recommended_by__profile=profile,
+            created_at__gte=timezone.now() - timedelta(hours=24)
+        ).annotate(hour=TruncHour('created_at')).values('hour').annotate(register_count=Count('id')).order_by('hour')
+
+        # FTDs, aggregated by hour for the past 24 hours
+        ftd_count = FTD.objects.filter(
+            recommended_by=profile,
+            created_at__gte=timezone.now() - timedelta(hours=24)
+        ).annotate(hour=TruncHour('created_at')).values('hour').annotate(ftd_count=Count('id')).order_by('hour')
+
+        # Merge the data
+        data = {}
+        for click in clicks:
+            hour = click['hour']
+            data[hour] = {'clicks': click['click_count'], 'registrations': 0, 'ftd_count': 0}
+
+        for registration in registrations:
+            hour = registration['hour']
+            if hour in data:
+                data[hour]['registrations'] = registration['register_count']
+            else:
+                data[hour] = {'clicks': 0, 'registrations': registration['register_count'], 'ftd_count': 0}
+
+        for ftd in ftd_count:
+            hour = ftd['hour']
+            if hour in data:
+                data[hour]['ftd_count'] = ftd['ftd_count']
+            else:
+                data[hour] = {'clicks': 0, 'registrations': 0, 'ftd_count': ftd['ftd_count']}
+
+        # Create the queryset-like structure for the serializer
+        queryset = [
+            {
+                'hour': hour,
+                'clicks': values['clicks'],
+                'register_count': values['registrations'],
+                'ftd_count': values['ftd_count']
+            }
+            for hour, values in data.items()
+        ]
+
+        # Pass the queryset to the serializer with many=True
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 class GetMain_chart_weekly(APIView):
     serializer_class=GetProfile_main_chart_

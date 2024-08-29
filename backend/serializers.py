@@ -49,6 +49,7 @@ class GetProfile_main_chart(serializers.Serializer):
     clicks=serializers.IntegerField()
     register_count=serializers.IntegerField()
     ftd_count=serializers.IntegerField()
+    hour=serializers.DateTimeField()
 class GetProfile_main(serializers.ModelSerializer):
     all_click=serializers.IntegerField()
     register_count=serializers.IntegerField()
@@ -62,8 +63,10 @@ class GetProfile_main(serializers.ModelSerializer):
 class Refferal_count_all_(serializers.Serializer):
     count=serializers.IntegerField()
     day=serializers.DateField(source='created_at__date')
+
 class Refferal_count_all(serializers.Serializer):
     count=serializers.IntegerField()
+    hour=serializers.DateTimeField()
 
 class Refferal_list_Ser(serializers.ModelSerializer):
     class Meta:

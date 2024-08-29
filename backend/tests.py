@@ -182,6 +182,11 @@ def test_count_link(test_get_sub,api):
     response = api.get(url)
     response = api.get(url)
 
+    with freeze_time(timezone.now() - timedelta(hours=2)):
+        response = api.get(url)
+        response = api.get(url)
+
+
 
     with freeze_time(timezone.now() - timedelta(days=6)):
         response = api.get(url)
@@ -192,7 +197,7 @@ def test_count_link(test_get_sub,api):
         response = api.get(url)
 
     assert response.status_code == status.HTTP_201_CREATED
-    assert Click_Referral.objects.filter(referral_link__code=code).count() == 6
+    assert Click_Referral.objects.filter(referral_link__code=code).count() == 8
 
 
 

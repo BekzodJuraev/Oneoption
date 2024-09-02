@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 import pika
 from broker.models import Userbroker
+from backend.models import Referral,Click_Referral
 import json
 
 class Command(BaseCommand):
@@ -10,15 +11,28 @@ class Command(BaseCommand):
         def callback(ch, method, properties, body):
             message = json.loads(body)
             email = message.get('email')
-            if email:
-                try:
-                    Userbroker.objects.create(email=email)
-                    print(f"Created Userbroker record with email: {email}")
-                except:
-                    print("user has")
+            uuid = message.get('uuid')
 
+            # Validate UUID
+            if not uuid:
+                print("UUID not found in the message")
             else:
-                print("No email field found in message")
+                ref_broker = Referral.objects.filter(code=uuid).first()
+
+
+                # Check if ref_broker exists
+                if not ref_broker:
+                    print("Referral with the provided UUID not found")
+                elif email:
+                    # Validate email by checking if a Userbroker record already exists
+                    if Userbroker.objects.filter(email=email, ref_broker=ref_broker).exists():
+                        print("Userbroker record with this email already exists")
+                    else:
+                        Click_Referral.objects.create(referral_link=ref_broker)
+                        Userbroker.objects.create(email=email, ref_broker=ref_broker)
+                        print(f"Created Userbroker record with email: {email}")
+                else:
+                    print("No email field found in message")
 
             # Process the message here
 

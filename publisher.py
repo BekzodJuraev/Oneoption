@@ -20,5 +20,5 @@ def publish_message(message):
     connection.close()
 
 if __name__ == '__main__':
-    message = {'email':"bekzsfod@gmail.com"}
+    message = {'email':"bekzsfod@gmail.com",'uuid':"68c8d187-8bd5-4221-8ff8-9af047e97ede"}
     publish_message(message)

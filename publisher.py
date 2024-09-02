@@ -13,12 +13,12 @@ def publish_message(message):
     # Publish the message to the queue
     channel.basic_publish(exchange='',
                           routing_key='user_registration',
-                          body=json.dumps(message))
+                          body=message)
     print(f"Sent '{message}'")
 
     # Close the connection
     connection.close()
 
 if __name__ == '__main__':
-    message = {'email':"bekzsfod@gmail.com",'uuid':"68c8d187-8bd5-4221-8ff8-9af047e97ede"}
+    message = {'email':"bekzsfod@gmail.com",'uuid':"9cf8b01d-a273-45a5-aeaa-1ce88a198cc7"}
     publish_message(message)

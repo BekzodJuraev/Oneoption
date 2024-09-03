@@ -92,7 +92,7 @@ class FTD(Base):
 class Wallet(Base):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='wallet')
     type_wallet=models.ForeignKey("Wallet_Type", on_delete=models.CASCADE)
-    wallet_id=models.CharField(max_length=100)
+    wallet_id=models.CharField(max_length=100,unique=True)
 
 
     def __str__(self):

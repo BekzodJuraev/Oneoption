@@ -30,6 +30,7 @@ from social_django.utils import psa
 from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
+import requests
 
 
 

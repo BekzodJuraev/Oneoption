@@ -1,9 +1,17 @@
 from django.contrib.auth.models import User
-from .models import Profile,Referral,FTD
+from .models import Profile,Referral,FTD,Wallet
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
+import requests
 
-
+@receiver(pre_save,sender=Wallet)
+def create_walet(sender,instance,*args,**kwargs):
+    if instance.type_wallet.name == "Bitcoin":
+        wallet_address=instance.wallet_id
+        api_url = f"https://api.blockcypher.com/v1/btc/main/addrs/{wallet_address}"
+        response = requests.get(api_url)
+        if response.status_code != 200:
+            raise ValueError("Invalid Bitcoin wallet address.")
 
 
 @receiver(post_save,sender=Profile)

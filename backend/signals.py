@@ -12,6 +12,14 @@ def create_walet(sender,instance,*args,**kwargs):
         response = requests.get(api_url)
         if response.status_code != 200:
             raise ValueError("Invalid Bitcoin wallet address.")
+    if instance.type_wallet.name == "Trc20":
+        wallet_address=instance.wallet_id
+        api_url = f"https://api.trongrid.io/v1/accounts/{wallet_address}"
+        response = requests.get(api_url)
+        if response.status_code != 200:
+            raise ValueError("Invalid Trc20 wallet address.")
+
+
 
 
 @receiver(post_save,sender=Profile)

@@ -328,7 +328,7 @@ def test_wallet_post(api,test_login,create_typewallet):
     }
     response = api.post(url,payload)
     payload1 = {
-        'type_wallet': 'USDT2',
+        'type_wallet': 'Trc20',
         'wallet_id': '123456'
     }
     response1 = api.post(url, payload1)

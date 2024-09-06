@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 from django.db import connection
 from django.db import models
 from rest_framework.exceptions import ValidationError
-
+from broker.models import Userbroker
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
@@ -332,7 +332,7 @@ class Refer_list(APIView):
         responses={status.HTTP_200_OK: Refferal_list_Ser(many=True)}
     )
     def get(self,request):
-        queryset = Profile.objects.filter(recommended_by__profile=self.request.user.profile)
+        queryset = Userbroker.objects.filter(ref_broker__profile=self.request.user.profile)
         email = request.query_params.get('email')
         id = request.query_params.get('id')
         if email:

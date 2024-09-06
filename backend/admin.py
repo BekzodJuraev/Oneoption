@@ -24,7 +24,7 @@ class PasswordReset(admin.ModelAdmin):
 
 @admin.register(Referral)
 class Referral(admin.ModelAdmin):
-    list_display = ['profile']
+    list_display = ['profile','code','referral_type']
 
 @admin.register(Click_Referral)
 class Click_Referral(admin.ModelAdmin):

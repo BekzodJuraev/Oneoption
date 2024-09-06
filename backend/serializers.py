@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import Profile,Referral,Wallet,Wallet_Type
 
-
+from broker.models import Userbroker
 
 class WithdrawSer(serializers.Serializer):
     wallet=serializers.CharField(source='type_wallet__name')
@@ -70,8 +70,8 @@ class Refferal_count_all(serializers.Serializer):
 
 class Refferal_list_Ser(serializers.ModelSerializer):
     class Meta:
-        model=Profile
-        fields=['id','nickname','deposit']
+        model=Userbroker
+        fields=['id','email']
 class Refferal_Ser(serializers.ModelSerializer):
     class Meta:
         model = Referral

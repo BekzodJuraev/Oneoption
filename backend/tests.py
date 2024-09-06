@@ -355,3 +355,5 @@ def test_withdraw_get(api,test_login,test_wallet_post):
     response = api.get(url)
     print(response.data)
     assert response.status_code == status.HTTP_200_OK
+
+

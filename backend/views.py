@@ -3,6 +3,8 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.db import connection
 from django.db import models
+from rest_framework.exceptions import ValidationError
+
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.authentication import TokenAuthentication
 from django.utils import timezone
@@ -624,10 +626,13 @@ class GetWalletType(APIView):
         responses={status.HTTP_200_OK: WalletPOST()}
     )
     def post(self,request):
-        serializer=WalletPOST(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(profile=request.user.profile)
-        return Response({'detail': 'Added Wallet','data':serializer.data}, status=status.HTTP_201_CREATED)
+        try:
+            serializer = WalletPOST(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(profile=request.user.profile)
+            return Response({'detail': 'Added Wallet', 'data': serializer.data}, status=status.HTTP_201_CREATED)
+        except ValueError as e:
+            raise ValidationError({"wallet_address": str(e)}, code=status.HTTP_400_BAD_REQUEST)
 
 class Withdraw(APIView):
     permission_classes = [IsAuthenticated]

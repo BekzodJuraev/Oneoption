@@ -7,17 +7,28 @@ import requests
 @receiver(pre_save,sender=Wallet)
 def create_walet(sender,instance,*args,**kwargs):
     if instance.type_wallet.name == "Bitcoin":
-        wallet_address=instance.wallet_id
+        wallet_address = instance.wallet_id
         api_url = f"https://api.blockcypher.com/v1/btc/main/addrs/{wallet_address}"
         response = requests.get(api_url)
         if response.status_code != 200:
             raise ValueError("Invalid Bitcoin wallet address.")
-    if instance.type_wallet.name == "Trc20":
-        wallet_address=instance.wallet_id
+
+    elif instance.type_wallet.name == "Trc20":
+        wallet_address = instance.wallet_id
         api_url = f"https://api.trongrid.io/v1/accounts/{wallet_address}"
         response = requests.get(api_url)
         if response.status_code != 200:
             raise ValueError("Invalid Trc20 wallet address.")
+
+    elif instance.type_wallet.name == "ERC20":
+        wallet_address = instance.wallet_id
+        api_url = f"https://api.etherscan.io/api?module=account&action=balance&address={wallet_address}&tag=latest&apikey=YOUR_ETHERSCAN_API_KEY"
+        response = requests.get(api_url)
+        if response.status_code != 200 or response.json().get('status') != '1':
+            raise ValueError("Invalid ERC20 wallet address.")
+
+
+
 
 
 

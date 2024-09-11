@@ -430,8 +430,8 @@ class GetMain_chart_daily(APIView):
         ).annotate(hour=TruncHour('created_at')).values('hour').annotate(click_count=Count('id')).order_by('hour')
 
         # Registrations, aggregated by hour for the past 24 hours
-        registrations = Profile.objects.filter(
-            recommended_by__profile=profile,
+        registrations = Userbroker.objects.filter(
+            ref_broker__profile=profile,
             created_at__gte=timezone.now() - timedelta(hours=24)
         ).annotate(hour=TruncHour('created_at')).values('hour').annotate(register_count=Count('id')).order_by('hour')
 
@@ -485,7 +485,7 @@ class GetMain_chart_weekly(APIView):
     def get(self,request):
         profile=request.user.profile
         clicks=Click_Referral.objects.filter(referral_link__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(click_count=Count('id'))
-        registrations  = Profile.objects.filter(recommended_by__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(register_count=Count('id'))
+        registrations  = Userbroker.objects.filter(ref_broker__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(register_count=Count('id'))
         ftd_count = FTD.objects.filter(recommended_by=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(ftd_count=Count('id'))
         data = {}
         for click in clicks:
@@ -535,7 +535,7 @@ class GetMain_chart_monthly(APIView):
         clicks = Click_Referral.objects.filter(referral_link__profile=profile,
                                                created_at__gte=timezone.now() - timedelta(days=29)).values(
             'created_at__date').annotate(click_count=Count('id'))
-        registrations = Profile.objects.filter(recommended_by__profile=profile,
+        registrations = Userbroker.objects.filter(ref_broker__profile=profile,
                                                created_at__gte=timezone.now() - timedelta(days=29)).values(
             'created_at__date').annotate(register_count=Count('id'))
         ftd_count = FTD.objects.filter(recommended_by=profile,

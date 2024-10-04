@@ -110,8 +110,7 @@ class RegistrationAPIView(generics.CreateAPIView):
 
 
     def post(self, request, *args, **kwargs):
-        code = request.query_params.get('code')
-        serializer = self.get_serializer(data=request.data, context={'code': code})
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 

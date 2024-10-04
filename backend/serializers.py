@@ -116,6 +116,7 @@ class LoginFormSerializer(serializers.Serializer):
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
+    token_ref=serializers.CharField(required=False)
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
@@ -134,12 +135,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'password','password2']
+        fields = ['email', 'password','password2','token_ref']
 
 
 
     def create(self, validated_data):
-        code=self.context.get('code')
+
 
         user = User.objects.create_user(
             username=validated_data['email'],
@@ -147,17 +148,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
         )
         nickname = user.email.split("@")[0]
-        if code:
 
+        token_ref = validated_data.get('token_ref')  # Add this line to retrieve the token_ref from validated_data
+
+        if token_ref:  # Corrected condition to check token_ref
             try:
-                ref = Referral.objects.get(code=code)
-                Profile.objects.create(username=user, email=user.email, nickname=nickname,recommended_by=ref)
+                ref = Referral.objects.get(code=token_ref)
+                Profile.objects.create(username=user, email=user.email, nickname=nickname, recommended_by=ref)
             except Referral.DoesNotExist:
-                Profile.objects.create(username=user, email=user.email,nickname=nickname)
+                Profile.objects.create(username=user, email=user.email, nickname=nickname)
         else:
-            Profile.objects.create(username=user, email=user.email,nickname=nickname)
-
-
+            Profile.objects.create(username=user, email=user.email, nickname=nickname)
 
         return user
 

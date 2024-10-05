@@ -20,7 +20,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -91,22 +91,32 @@ class LoginAPIView(APIView):
         return Response({'detail': 'Invalid form data'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class RegistrationAPIView(generics.CreateAPIView):
-    authentication_classes = [TokenAuthentication]
+class Token_Click(APIView):
+    serializer_class=ClickToken
 
-    serializer_class = RegistrationSerializer
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: ClickToken()}
+    )
+
+    def post(self,request):
+        form=self.serializer_class(data=request.data)
+        if form.is_valid():
+            token_ref = form.validated_data.get('token_ref')
+            try:
+                get_link = Referral.objects.get(code=token_ref)
+                Click_Referral.objects.create(referral_link=get_link)
+                return Response({'detail': 'Click to link created'}, status=status.HTTP_201_CREATED)
+            except:
+                return Response({'detail': 'Token invalid'}, status=status.HTTP_404_NOT_FOUND)
 
 
-    def get(self,request):
-        code = request.query_params.get('code')
-        if code:
-            get_link=Referral.objects.get(code=code)
-            Click_Referral.objects.create(referral_link=get_link)
-
-            return Response({'detail': 'Click to link created'}, status=status.HTTP_201_CREATED)
         return Response({'detail': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+class RegistrationAPIView(generics.CreateAPIView):
+    authentication_classes = [TokenAuthentication]
+    serializer_class = RegistrationSerializer
 
 
     def post(self, request, *args, **kwargs):

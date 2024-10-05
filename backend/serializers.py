@@ -112,11 +112,16 @@ class LoginFormSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
 
+class ClickToken(serializers.Serializer):
+    token_ref = serializers.CharField(required=True)
+
+
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
     token_ref=serializers.CharField(required=False)
+    email=serializers.EmailField(required=True)
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():

@@ -120,7 +120,7 @@ class ClickToken(serializers.Serializer):
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
-    token_ref=serializers.CharField(required=False)
+    token_ref=serializers.UUIDField(required=False)
     email=serializers.EmailField(required=True)
 
     def validate_email(self, value):
@@ -158,6 +158,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         if token_ref:  # Corrected condition to check token_ref
             try:
+
                 ref = Referral.objects.get(code=token_ref)
                 Profile.objects.create(username=user, email=user.email, nickname=nickname, recommended_by=ref)
             except Referral.DoesNotExist:

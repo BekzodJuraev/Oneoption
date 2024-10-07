@@ -8,16 +8,16 @@ class Command(BaseCommand):
     help = 'Starts the RabbitMQ consumer to process messages'
 
     def handle(self, *args, **kwargs):
+
         def callback(ch, method, properties, body):
+
             print(f"Received: {body}")
 
             try:
                 # Decode the byte string into a regular string
                 decoded_message = body.decode('utf-8')
 
-                # If the message was originally encoded as a string representation of a Python object (e.g., a dictionary),
-                # you can convert it back using eval (only if you trust the source of the message)
-                message = eval(decoded_message)  # Be cautious when using eval due to security risks!
+                message = eval(decoded_message)
 
                 print(f"Decoded Message: {message}")
 
@@ -50,6 +50,10 @@ class Command(BaseCommand):
             except Exception as e:
                 print(f"Error processing message: {e}")
 
+        def transaction(ch, method, properties, body):
+            print(f"Received: {body}")
+
+
 
         def start_consumer():
             credentials = pika.PlainCredentials('root', '123')
@@ -59,11 +63,18 @@ class Command(BaseCommand):
             channel = connection.channel()
 
             # Declare the queue from which the consumer will receive messages
+
             channel.queue_declare(queue='user_registration',durable=True)
 
             channel.basic_consume(
                 queue='user_registration', on_message_callback=callback, auto_ack=True
             )
+            channel.queue_declare(queue='transactions',durable=True)
+            channel.basic_consume(
+                queue='transactions', on_message_callback=transaction, auto_ack=True
+            )
+
+
 
             print('Waiting for messages. To exit press CTRL+C')
             channel.start_consuming()

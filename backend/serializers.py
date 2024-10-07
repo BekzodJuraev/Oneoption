@@ -146,7 +146,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
+        token_ref = validated_data.get('token_ref')
 
+        if token_ref:
+            try:
+                ref = Referral.objects.get(code=token_ref)
+            except Referral.DoesNotExist:
+                raise serializers.ValidationError({"token_ref": "Token does not exist."})
+        else:
+            ref = None  # No referral if token_ref not provided
+
+        # Now create the user after all validations have passed
         user = User.objects.create_user(
             username=validated_data['email'],
             email=validated_data['email'],
@@ -154,20 +164,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
         )
         nickname = user.email.split("@")[0]
 
-        token_ref = validated_data.get('token_ref')  # Add this line to retrieve the token_ref from validated_data
-
-        if token_ref:  # Corrected condition to check token_ref
-            try:
-
-                ref = Referral.objects.get(code=token_ref)
-                Profile.objects.create(username=user, email=user.email, nickname=nickname, recommended_by=ref)
-            except Referral.DoesNotExist:
-                Profile.objects.create(username=user, email=user.email, nickname=nickname)
-        else:
-            Profile.objects.create(username=user, email=user.email, nickname=nickname)
+        # Create the user's profile with or without referral
+        Profile.objects.create(
+            username=user, email=user.email, nickname=nickname, recommended_by=ref
+        )
 
         return user
-
 
 class PasswordResetSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True, required=True, min_length=8)

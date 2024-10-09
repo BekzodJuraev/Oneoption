@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 import pika
 from broker.models import Userbroker
-from backend.models import Referral,Click_Referral
+from backend.models import Referral,Register_by_ref
 import json
 
 class Command(BaseCommand):
@@ -21,14 +21,24 @@ class Command(BaseCommand):
 
                 print(f"Decoded Message: {message}")
 
-                # Now `message` is a Python dictionary, so you can access its fields
+                id=message.get('id')
                 email = message.get('email')
                 token = message.get('token')
                 uuid=message.get('uuid')
-
-                if email and uuid:
-                    Userbroker.objects.create(email=email,uuid=uuid)
+                if token:
+                    try:
+                        token=Referral.objects.get(code=token)
+                    except:
+                        token=None
+                        print("Token not exist")
+                if email and uuid and id:
+                    user_broker, created=Userbroker.objects.get_or_create(id=id,email=email,uuid=uuid)
                     print("User created")
+                    if token:
+                        Register_by_ref.objects.create(user_broker=user_broker, recommended_by=token)
+                        print("Registered by token")
+
+
                 else:
                     print("Not provided")
 

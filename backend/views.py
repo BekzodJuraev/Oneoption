@@ -20,7 +20,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,Register_by_ref
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -440,7 +440,7 @@ class GetMain(APIView):
     def get(self,request):
         profile = request.user.profile
         click_all=Click_Referral.objects.filter(referral_link__profile=profile).count()
-        register_count=Userbroker.objects.filter(ref_broker__profile=self.request.user.profile).count()
+        register_count=Register_by_ref.objects.filter(recommended_by__profile=self.request.user.profile).count()
         ftd=FTD.objects.filter(recommended_by=profile).aggregate(ftd_sum=Sum('ftd'),count=Count('id'))
         witdraw_ref=Profile.objects.filter(recommended_by__profile=profile).aggregate(witdraw_ref=Sum('withdraw'))['witdraw_ref']
         oborot=Profile.objects.filter(recommended_by__profile=profile).aggregate(oborot=Sum('total'))['oborot']
@@ -477,8 +477,8 @@ class GetMain_chart_daily(APIView):
         ).annotate(hour=TruncHour('created_at')).values('hour').annotate(click_count=Count('id')).order_by('hour')
 
         # Registrations, aggregated by hour for the past 24 hours
-        registrations = Userbroker.objects.filter(
-            ref_broker__profile=profile,
+        registrations = Register_by_ref.objects.filter(
+            recommended_by__profile=profile,
             created_at__gte=timezone.now() - timedelta(hours=24)
         ).annotate(hour=TruncHour('created_at')).values('hour').annotate(register_count=Count('id')).order_by('hour')
 
@@ -546,8 +546,8 @@ class GetMain_chart_weekly(APIView):
         ).values('created_at__date').annotate(click_count=Count('id'))
 
         # Get the registration data (convert created_at to date in the query)
-        registrations = Userbroker.objects.filter(
-            ref_broker__profile=profile,
+        registrations = Register_by_ref.objects.filter(
+            recommended_by__profile=profile,
             created_at__gte=start_date
         ).values('created_at__date').annotate(register_count=Count('id'))
 
@@ -611,7 +611,7 @@ class GetMain_chart_monthly(APIView):
             'created_at__date').annotate(click_count=Count('id'))
 
         # Get the registration data
-        registrations = Userbroker.objects.filter(ref_broker__profile=profile,
+        registrations = Register_by_ref.objects.filter(recommended_by__profile=profile,
                                                   created_at__gte=start_date).values(
             'created_at__date').annotate(register_count=Count('id'))
 

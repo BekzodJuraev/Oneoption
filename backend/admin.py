@@ -1,7 +1,10 @@
 from django.contrib import admin
-from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet
+from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet,Register_by_ref
 
 
+@admin.register(Register_by_ref)
+class Register_by_ref(admin.ModelAdmin):
+    list_display = ['profile','user_broker','recommended_by']
 @admin.register(Wallet_Type)
 class Wallet_Type(admin.ModelAdmin):
     pass
@@ -14,7 +17,7 @@ class FTDadmin(admin.ModelAdmin):
     list_display = ['profile','ftd']
 @admin.register(Profile)
 class Profileadmin(admin.ModelAdmin):
-    list_display = ['username','email','deposit','recommended_by']
+    list_display = ['username','email','deposit']
 
 # Register your models here.
 @admin.register(PasswordReset)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+
 class Base(models.Model):
     created_at = models.DateTimeField(auto_now_add=True,null=True)
 
@@ -16,7 +17,6 @@ class Profile(Base):
     nickname = models.CharField(max_length=150)
     email = models.EmailField()
     deposit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    recommended_by = models.ForeignKey('Referral', on_delete=models.CASCADE, related_name='recommended_profiles', null=True, blank=True)
     withdraw=models.DecimalField(max_digits=10,decimal_places=2,default=0)
     level=models.IntegerField(default=1)
     total_income=models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -72,6 +72,13 @@ class Referral(models.Model):
 
 
 
+class Register_by_ref(Base):
+    from broker.models import Userbroker
+    profile=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='register_by_ref_profile',
+                                       null=True, blank=True)
+    user_broker=models.ForeignKey(Userbroker, on_delete=models.CASCADE, related_name='register_by_ref_user_broker',
+                                       null=True, blank=True)
+    recommended_by = models.ForeignKey(Referral, on_delete=models.CASCADE, related_name='register_by_ref')
 
 
 

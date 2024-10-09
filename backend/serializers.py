@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Profile,Referral,Wallet,Wallet_Type
+from .models import Profile,Referral,Wallet,Wallet_Type,Register_by_ref
 
 from broker.models import Userbroker
 
@@ -165,9 +165,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
         nickname = user.email.split("@")[0]
 
         # Create the user's profile with or without referral
-        Profile.objects.create(
-            username=user, email=user.email, nickname=nickname, recommended_by=ref
-        )
+        profile=Profile.objects.create(
+            username=user, email=user.email, nickname=nickname)
+
+        if ref:
+            Register_by_ref.objects.create(profile=profile, recommended_by=ref)
+
+
 
         return user
 

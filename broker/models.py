@@ -1,5 +1,5 @@
 from django.db import models
-from backend.models import Referral,Base
+from backend.models import Base
 import uuid
 # Create your models here.
 class Userbroker(Base):

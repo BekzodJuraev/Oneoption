@@ -8,11 +8,11 @@ def publish_message(message):
     channel = connection.channel()
 
     # Declare the queue to ensure it exists
-    channel.queue_declare(queue='transactions',durable=True)
+    channel.queue_declare(queue='test',durable=True)
 
     # Publish the message to the queue
     channel.basic_publish(exchange='',
-                          routing_key='transactions',
+                          routing_key='test',
                           body=json.dumps(message))
     print(f"Sent '{message}'")
 

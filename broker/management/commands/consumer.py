@@ -23,15 +23,13 @@ class Command(BaseCommand):
 
                 # Now `message` is a Python dictionary, so you can access its fields
                 email = message.get('email')
-                uuid = message.get('sing_up')
+                token = message.get('token')
 
-                # Continue processing as usual...
 
-                # Validate UUID
-                if not uuid:
-                    print("UUID not found in the message")
+                if not token:
+                    print("Token not found in the message")
                 else:
-                    ref_broker = Referral.objects.filter(code=uuid).first()
+                    ref_broker = Referral.objects.filter(code=token).first()
 
                     # Check if ref_broker exists
                     if not ref_broker:

@@ -62,7 +62,7 @@ class GetProfile_main(serializers.ModelSerializer):
         fields=['all_click','register_count','deposit','ftd_count','ftd_sum','witdraw_ref','oborot']
 class Refferal_count_all_(serializers.Serializer):
     count=serializers.IntegerField()
-    day=serializers.DateField(source='created_at__date')
+    day=serializers.DateField()
 
 class Refferal_count_all(serializers.Serializer):
     count=serializers.IntegerField()
@@ -72,10 +72,10 @@ class Refferal_list_Ser(serializers.ModelSerializer):
     class Meta:
         model=Userbroker
         fields=['id','email']
-class Refferal_Ser(serializers.ModelSerializer):
-    class Meta:
-        model = Referral
-        fields=['code']
+class Refferal_Ser(serializers.Serializer):
+    oborot=serializers.UUIDField()
+    doxod = serializers.UUIDField()
+    sub = serializers.UUIDField()
 
 
 

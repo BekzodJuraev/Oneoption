@@ -28,4 +28,4 @@ class Referral(admin.ModelAdmin):
 
 @admin.register(Click_Referral)
 class Click_Referral(admin.ModelAdmin):
-    list_display = ['referral_link']
+    list_display = ['referral_link','created_at']

@@ -70,6 +70,11 @@ class Referral(models.Model):
 
 
 
+
+
+
+
+
 class Click_Referral(Base):
     referral_link=models.ForeignKey(Referral,on_delete=models.CASCADE,related_name='referal_link')
 

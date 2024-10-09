@@ -288,38 +288,9 @@ class Profile_View(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GetRefraldoxod(APIView):
-    authentication_classes = [TokenAuthentication]
-    serializer_class = Refferal_Ser
-    permission_classes = [IsAuthenticated, ]
-
-    @swagger_auto_schema(
-        responses={status.HTTP_200_OK: Refferal_Ser()}
-    )
-    def get(self,request):
-        queryset = Referral.objects.get(profile=self.request.user.profile,referral_type='doxod')
-        serializer = self.serializer_class(queryset)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class GetRefraloborot(APIView):
-
-    authentication_classes = [TokenAuthentication]
-    serializer_class = Refferal_Ser
-    permission_classes = [IsAuthenticated, ]
-
-    @swagger_auto_schema(
-        responses={status.HTTP_200_OK: Refferal_Ser()}
-    )
-    def get(self,request):
-        queryset = Referral.objects.get(profile=self.request.user.profile,referral_type='oborot')
-        serializer = self.serializer_class(queryset)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
-
-class GetRefralsub(APIView):
+class GetRefral_link(APIView):
     authentication_classes = [TokenAuthentication]
     serializer_class = Refferal_Ser
     permission_classes = [IsAuthenticated, ]
@@ -329,9 +300,18 @@ class GetRefralsub(APIView):
     )
 
     def get(self, request):
-        queryset = Referral.objects.get(profile=self.request.user.profile, referral_type='sub')
-        serializer = self.serializer_class(queryset)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        queryset = {
+            "oborot":Referral.objects.get(profile=self.request.user.profile,referral_type='oborot').code,
+            "doxod":Referral.objects.get(profile=self.request.user.profile,referral_type='doxod').code,
+            "sub":Referral.objects.get(profile=self.request.user.profile,referral_type='sub').code
+                    }
+        serializer = self.serializer_class(data=queryset)
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class Refer_list(APIView):
     authentication_classes = [TokenAuthentication]
     serializer_class = Refferal_list_Ser
@@ -375,8 +355,38 @@ class Referall_count_weekly(APIView):
         responses={status.HTTP_200_OK: Refferal_count_all_(many=True)}
     )
     def get(self,request):
-        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(count=Count('id'))
-        serializer = self.serializer_class(queryset,many=True)
+        start_date = timezone.now().date() - timedelta(days=7)
+
+
+        # Prepare a list of all dates for the last 29 days
+        date_range = [start_date + timedelta(days=x) for x in range(0, 8)]
+
+
+        # Initialize a dictionary with default values for each date
+        data = {date: {'click_count': 0} for date in date_range}
+
+        # Get click data from the database
+        queryset = Click_Referral.objects.filter(
+            referral_link__profile=request.user.profile,
+            created_at__gte=start_date
+        ).values('created_at__date').annotate(count=Count('id'))
+
+        # Populate the data dictionary with actual click counts
+        for click in queryset:
+            date = click['created_at__date']
+            data[date]['click_count'] = click['count']
+
+        # Convert the data to a list for serialization
+        response_data = [
+            {
+                'day': date,
+                'count': values['click_count']
+            }
+            for date, values in data.items()
+        ]
+
+        # Serialize the response data
+        serializer = self.serializer_class(response_data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class Referall_count_monthly(APIView):
@@ -387,8 +397,36 @@ class Referall_count_monthly(APIView):
         responses={status.HTTP_200_OK: Refferal_count_all_(many=True)}
     )
     def get(self,request):
-        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(days=29)).values('created_at__date').annotate(count=Count('id'))
-        serializer = self.serializer_class(queryset,many=True)
+        start_date = timezone.now().date() - timedelta(days=29)
+
+        # Prepare a list of all dates for the last 29 days
+        date_range = [start_date + timedelta(days=x) for x in range(0, 30)]
+
+        # Initialize a dictionary with default values for each date
+        data = {date: {'click_count': 0} for date in date_range}
+
+        # Get click data from the database
+        queryset = Click_Referral.objects.filter(
+            referral_link__profile=request.user.profile,
+            created_at__gte=start_date
+        ).values('created_at__date').annotate(count=Count('id'))
+
+        # Populate the data dictionary with actual click counts
+        for click in queryset:
+            date = click['created_at__date']
+            data[date]['click_count'] = click['count']
+
+        # Convert the data to a list for serialization
+        response_data = [
+            {
+                'day': date,
+                'count': values['click_count']
+            }
+            for date, values in data.items()
+        ]
+
+        # Serialize the response data
+        serializer = self.serializer_class(response_data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class GetMain(APIView):
@@ -493,40 +531,58 @@ class GetMain_chart_weekly(APIView):
     )
     def get(self,request):
         profile=request.user.profile
-        clicks=Click_Referral.objects.filter(referral_link__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(click_count=Count('id'))
-        registrations  = Userbroker.objects.filter(ref_broker__profile=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(register_count=Count('id'))
-        ftd_count = FTD.objects.filter(recommended_by=profile,created_at__gte=timezone.now() - timedelta(days=7)).values('created_at__date').annotate(ftd_count=Count('id'))
-        data = {}
+        start_date = timezone.now().date() - timedelta(days=7)
+
+        # Prepare a list of all dates within the last 7 days (only dates)
+        date_range = [start_date + timedelta(days=x) for x in range(0, 8)]
+
+        # Initialize a dictionary to ensure all dates have default values (using only dates)
+        data = {date: {'clicks': 0, 'registrations': 0, 'ftd_count': 0} for date in date_range}
+
+        # Get the click data (convert created_at to date in the query)
+        clicks = Click_Referral.objects.filter(
+            referral_link__profile=profile,
+            created_at__gte=start_date
+        ).values('created_at__date').annotate(click_count=Count('id'))
+
+        # Get the registration data (convert created_at to date in the query)
+        registrations = Userbroker.objects.filter(
+            ref_broker__profile=profile,
+            created_at__gte=start_date
+        ).values('created_at__date').annotate(register_count=Count('id'))
+
+        # Get the FTD count data (convert created_at to date in the query)
+        ftd_count = FTD.objects.filter(
+            recommended_by=profile,
+            created_at__gte=start_date
+        ).values('created_at__date').annotate(ftd_count=Count('id'))
+
+        # Populate the data dictionary with actual click, registration, and FTD data
         for click in clicks:
             date = click['created_at__date']
-            data[date] = {'clicks': click['click_count'], 'registrations': 0,'ftd_count':0}
+            data[date]['clicks'] = click['click_count']
 
         for registration in registrations:
             date = registration['created_at__date']
-            if date in data:
-                data[date]['registrations'] = registration['register_count']
-            else:
-                data[date] = {'clicks': 0, 'registrations': registration['register_count'],'ftd_count':0}
+            data[date]['registrations'] = registration['register_count']
 
         for ftd in ftd_count:
             date = ftd['created_at__date']
-            if date in data:
-                data[date]['ftd_count'] = ftd['ftd_count']
-            else:
-                data[date] = {'clicks': 0, 'registrations': 0, 'ftd_count': ftd['ftd_count']}
+            data[date]['ftd_count'] = ftd['ftd_count']
 
-
+        # Convert to list of dictionaries for serialization
         queryset = [
             {
                 'created_at__date': date,
                 'clicks': values['clicks'],
                 'register_count': values['registrations'],
-                'ftd_count':values['ftd_count']
+                'ftd_count': values['ftd_count']
             }
             for date, values in data.items()
         ]
-        serializer = self.serializer_class(queryset, many=True)
 
+        # Serialize and return the response
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -541,35 +597,41 @@ class GetMain_chart_monthly(APIView):
 
     def get(self, request):
         profile = request.user.profile
+        start_date = timezone.now() - timedelta(days=29)
+
+        # Prepare a list of all dates within the last 29 days
+        date_range = [start_date + timedelta(days=x) for x in range(0, 30)]
+
+        # Initialize a defaultdict to ensure all dates have default values
+        data = {date.date(): {'clicks': 0, 'registrations': 0, 'ftd_count': 0} for date in date_range}
+
+        # Get the click data
         clicks = Click_Referral.objects.filter(referral_link__profile=profile,
-                                               created_at__gte=timezone.now() - timedelta(days=29)).values(
+                                               created_at__gte=start_date).values(
             'created_at__date').annotate(click_count=Count('id'))
+
+        # Get the registration data
         registrations = Userbroker.objects.filter(ref_broker__profile=profile,
-                                               created_at__gte=timezone.now() - timedelta(days=29)).values(
+                                                  created_at__gte=start_date).values(
             'created_at__date').annotate(register_count=Count('id'))
+
+        # Get the FTD count data
         ftd_count = FTD.objects.filter(recommended_by=profile,
-                                       created_at__gte=timezone.now() - timedelta(days=29)).values(
+                                       created_at__gte=start_date).values(
             'created_at__date').annotate(ftd_count=Count('id'))
-        data = {}
+
+        # Populate the data dictionary with actual click, registration, and FTD data
         for click in clicks:
             date = click['created_at__date']
-            data[date] = {'clicks': click['click_count'], 'registrations': 0, 'ftd_count': 0}
+            data[date]['clicks'] = click['click_count']
 
         for registration in registrations:
             date = registration['created_at__date']
-            if date in data:
-                data[date]['registrations'] = registration['register_count']
-            else:
-                data[date] = {'clicks': 0, 'registrations': registration['register_count'], 'ftd_count': 0}
+            data[date]['registrations'] = registration['register_count']
 
         for ftd in ftd_count:
             date = ftd['created_at__date']
-            if date in data:
-                data[date]['ftd_count'] = ftd['ftd_count']
-            else:
-                data[date] = {'clicks': 0, 'registrations': 0, 'ftd_count': ftd['ftd_count']}
-
-
+            data[date]['ftd_count'] = ftd['ftd_count']
 
         # Convert to list of dictionaries for serialization
         queryset = [
@@ -581,8 +643,9 @@ class GetMain_chart_monthly(APIView):
             }
             for date, values in data.items()
         ]
-        serializer = self.serializer_class(queryset, many=True)
 
+        # Serialize and return the response
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

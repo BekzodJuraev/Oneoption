@@ -4,8 +4,8 @@ import uuid
 # Create your models here.
 class Userbroker(Base):
     email=models.EmailField(unique=True)
-    ref_broker = models.ForeignKey(Referral, on_delete=models.CASCADE, related_name='ref_broker',
-                                       null=True, blank=True)
+    uuid=models.UUIDField(unique=True)
+
 
 
     def __str__(self):

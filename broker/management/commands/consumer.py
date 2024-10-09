@@ -24,26 +24,13 @@ class Command(BaseCommand):
                 # Now `message` is a Python dictionary, so you can access its fields
                 email = message.get('email')
                 token = message.get('token')
+                uuid=message.get('uuid')
 
-
-                if not token:
-                    print("Token not found in the message")
+                if email and uuid:
+                    Userbroker.objects.create(email=email,uuid=uuid)
+                    print("User created")
                 else:
-                    ref_broker = Referral.objects.filter(code=token).first()
-
-                    # Check if ref_broker exists
-                    if not ref_broker:
-                        print("Referral with the provided UUID not found")
-                    elif email:
-                        # Validate email by checking if a Userbroker record already exists
-                        if Userbroker.objects.filter(email=email, ref_broker=ref_broker).exists():
-                            print("Userbroker record with this email already exists")
-                        else:
-                            Click_Referral.objects.create(referral_link=ref_broker)
-                            Userbroker.objects.create(email=email, ref_broker=ref_broker)
-                            print(f"Created Userbroker record with email: {email}")
-                    else:
-                        print("No email field found in message")
+                    print("Not provided")
 
             except Exception as e:
                 print(f"Error processing message: {e}")

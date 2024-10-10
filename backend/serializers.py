@@ -69,8 +69,10 @@ class Refferal_count_all(serializers.Serializer):
     hour=serializers.DateTimeField()
 
 class Refferal_list_Ser(serializers.ModelSerializer):
+    email=serializers.EmailField(source='user_broker.email',required=False)
+    id=serializers.IntegerField(source='user_broker.id',required=False)
     class Meta:
-        model=Userbroker
+        model=Register_by_ref
         fields=['id','email']
 class Refferal_Ser(serializers.Serializer):
     oborot=serializers.UUIDField()

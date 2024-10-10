@@ -321,13 +321,13 @@ class Refer_list(APIView):
         responses={status.HTTP_200_OK: Refferal_list_Ser(many=True)}
     )
     def get(self,request):
-        queryset = Userbroker.objects.filter(ref_broker__profile=self.request.user.profile)
+        queryset = Register_by_ref.objects.filter(recommended_by__profile=self.request.user.profile,user_broker__isnull=False)
         email = request.query_params.get('email')
         id = request.query_params.get('id')
         if email:
-            queryset=queryset.filter(email=email)
+            queryset = queryset.filter(user_broker__email__icontains=email)
         if id:
-            queryset = queryset.filter(id=id)
+            queryset = queryset.filter(user_broker__id=id)
 
         serializer = self.serializer_class(queryset,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

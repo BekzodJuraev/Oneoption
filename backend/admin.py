@@ -14,7 +14,7 @@ class Wallet(admin.ModelAdmin):
 
 @admin.register(FTD)
 class FTDadmin(admin.ModelAdmin):
-    list_display = ['profile','ftd']
+    list_display = ['user_broker','ftd']
 @admin.register(Profile)
 class Profileadmin(admin.ModelAdmin):
     list_display = ['username','email','deposit']

@@ -90,12 +90,13 @@ class Click_Referral(Base):
 
 
 class FTD(Base):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='FTD')
+    from broker.models import Userbroker
+    user_broker = models.ForeignKey(Userbroker, on_delete=models.CASCADE, related_name='FTD')
     recommended_by=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='recommended')
     ftd=models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
-        return self.profile.email
+        return self.user_broker.email
 
 
 

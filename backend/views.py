@@ -442,7 +442,9 @@ class GetMain(APIView):
         click_all=Click_Referral.objects.filter(referral_link__profile=profile).count()
         register_count=Register_by_ref.objects.filter(recommended_by__profile=self.request.user.profile).count()
         ftd=FTD.objects.filter(recommended_by=profile).aggregate(ftd_sum=Sum('ftd'),count=Count('id'))
+
         witdraw_ref=Profile.objects.filter(recommended_by__profile=profile).aggregate(witdraw_ref=Sum('withdraw'))['witdraw_ref']
+
         oborot=Profile.objects.filter(recommended_by__profile=profile).aggregate(oborot=Sum('total'))['oborot']
 
 

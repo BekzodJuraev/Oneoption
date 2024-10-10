@@ -1,10 +1,8 @@
 from django.contrib import admin
-from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet,Register_by_ref
+from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet
 
 
-@admin.register(Register_by_ref)
-class Register_by_ref(admin.ModelAdmin):
-    list_display = ['user_broker','recommended_by']
+
 @admin.register(Wallet_Type)
 class Wallet_Type(admin.ModelAdmin):
     pass

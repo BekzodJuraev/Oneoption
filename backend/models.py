@@ -74,12 +74,7 @@ class Referral(models.Model):
 
 
 
-class Register_by_ref(Base):
-    from broker.models import Userbroker
 
-    user_broker=models.ForeignKey(Userbroker, on_delete=models.CASCADE, related_name='register_by_ref_user_broker',
-                                       null=True, blank=True)
-    recommended_by = models.ForeignKey(Referral, on_delete=models.CASCADE, related_name='register_by_ref')
 
 
 

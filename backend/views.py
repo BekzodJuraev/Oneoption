@@ -20,7 +20,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,Register_by_ref
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny

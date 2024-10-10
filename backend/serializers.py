@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Profile,Referral,Wallet,Wallet_Type,Register_by_ref
+from .models import Profile,Referral,Wallet,Wallet_Type
 
 from broker.models import Userbroker
 
@@ -69,11 +69,12 @@ class Refferal_count_all(serializers.Serializer):
     hour=serializers.DateTimeField()
 
 class Refferal_list_Ser(serializers.ModelSerializer):
-    email=serializers.EmailField(source='user_broker.email',required=False)
-    id=serializers.IntegerField(source='user_broker.id',required=False)
-    class Meta:
-        model=Register_by_ref
-        fields=['id','email']
+    pass
+    # email=serializers.EmailField(source='user_broker.email',required=False)
+    # id=serializers.IntegerField(source='user_broker.id',required=False)
+    # class Meta:
+    #     model=Register_by_ref
+    #     fields=['id','email']
 class Refferal_Ser(serializers.Serializer):
     oborot=serializers.UUIDField()
     doxod = serializers.UUIDField()
@@ -126,7 +127,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     email=serializers.EmailField(required=True)
 
     def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
+        if User.objects.filter(email=value).exists() or Userbroker.objects.filter(email=value).exists():
             raise serializers.ValidationError("This email address is already registered. Please use a different one.")
         return value
 
@@ -158,7 +159,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         else:
             ref = None  # No referral if token_ref not provided
 
-        # Now create the user after all validations have passed
+
         user = User.objects.create_user(
             username=validated_data['email'],
             email=validated_data['email'],

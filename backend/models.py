@@ -24,6 +24,8 @@ class Profile(Base):
     income_doxod = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total=models.DecimalField(max_digits=10, decimal_places=2, default=0)
     photo = models.ImageField()
+    # broker_ref = models.ForeignKey(Userbroker, on_delete=models.CASCADE, related_name='register_by_ref_user_broker',
+    #                                null=True, blank=True)
 
 
 
@@ -74,8 +76,7 @@ class Referral(models.Model):
 
 class Register_by_ref(Base):
     from broker.models import Userbroker
-    profile=models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='register_by_ref_profile',
-                                       null=True, blank=True)
+
     user_broker=models.ForeignKey(Userbroker, on_delete=models.CASCADE, related_name='register_by_ref_user_broker',
                                        null=True, blank=True)
     recommended_by = models.ForeignKey(Referral, on_delete=models.CASCADE, related_name='register_by_ref')

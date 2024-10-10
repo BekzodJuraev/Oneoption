@@ -440,7 +440,8 @@ class GetMain(APIView):
     def get(self,request):
         profile = request.user.profile
         click_all=Click_Referral.objects.filter(referral_link__profile=profile).count()
-        register_count=Register_by_ref.objects.filter(recommended_by__profile=self.request.user.profile).count()
+        register_count=Userbroker.objects.filter(
+            broker_ref__profile=profile)
         ftd=FTD.objects.filter(recommended_by=profile).aggregate(ftd_sum=Sum('ftd'),count=Count('id'))
 
         witdraw_ref=Profile.objects.filter(recommended_by__profile=profile).aggregate(witdraw_ref=Sum('withdraw'))['witdraw_ref']
@@ -479,8 +480,8 @@ class GetMain_chart_daily(APIView):
         ).annotate(hour=TruncHour('created_at')).values('hour').annotate(click_count=Count('id')).order_by('hour')
 
         # Registrations, aggregated by hour for the past 24 hours
-        registrations = Register_by_ref.objects.filter(
-            recommended_by__profile=profile,
+        registrations = Userbroker.objects.filter(
+            broker_ref__profile=profile,
             created_at__gte=timezone.now() - timedelta(hours=24)
         ).annotate(hour=TruncHour('created_at')).values('hour').annotate(register_count=Count('id')).order_by('hour')
 
@@ -548,8 +549,8 @@ class GetMain_chart_weekly(APIView):
         ).values('created_at__date').annotate(click_count=Count('id'))
 
         # Get the registration data (convert created_at to date in the query)
-        registrations = Register_by_ref.objects.filter(
-            recommended_by__profile=profile,
+        registrations = Userbroker.objects.filter(
+            broker_ref__profile=profile,
             created_at__gte=start_date
         ).values('created_at__date').annotate(register_count=Count('id'))
 
@@ -613,9 +614,10 @@ class GetMain_chart_monthly(APIView):
             'created_at__date').annotate(click_count=Count('id'))
 
         # Get the registration data
-        registrations = Register_by_ref.objects.filter(recommended_by__profile=profile,
-                                                  created_at__gte=start_date).values(
-            'created_at__date').annotate(register_count=Count('id'))
+        registrations = Userbroker.objects.filter(
+            broker_ref__profile=profile,
+            created_at__gte=start_date
+        ).values('created_at__date').annotate(register_count=Count('id'))
 
         # Get the FTD count data
         ftd_count = FTD.objects.filter(recommended_by=profile,

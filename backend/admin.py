@@ -4,7 +4,7 @@ from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Typ
 
 @admin.register(Register_by_ref)
 class Register_by_ref(admin.ModelAdmin):
-    list_display = ['profile','user_broker','recommended_by']
+    list_display = ['user_broker','recommended_by']
 @admin.register(Wallet_Type)
 class Wallet_Type(admin.ModelAdmin):
     pass

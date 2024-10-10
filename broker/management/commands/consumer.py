@@ -32,11 +32,8 @@ class Command(BaseCommand):
                         token=None
                         print("Token not exist")
                 if email and uuid and id:
-                    user_broker, created=Userbroker.objects.get_or_create(id=id,email=email,uuid=uuid)
-                    print("User created")
-                    if token:
-                        Register_by_ref.objects.create(user_broker=user_broker, recommended_by=token)
-                        print("Registered by token")
+                    Userbroker.objects.get_or_create(id=id,email=email,uuid=uuid,broker_ref=token)
+
 
 
                 else:

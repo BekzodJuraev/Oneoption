@@ -3,6 +3,8 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.db import connection
 from django.db import models
+from rest_framework.throttling import UserRateThrottle
+
 from rest_framework.exceptions import ValidationError
 from broker.models import Userbroker
 from drf_yasg.utils import swagger_auto_schema
@@ -93,22 +95,25 @@ class LoginAPIView(APIView):
 
 class Token_Click(APIView):
     serializer_class=ClickToken
+    throttle_classes = [UserRateThrottle]
 
     @swagger_auto_schema(
         responses={status.HTTP_200_OK: ClickToken()}
     )
-
-    def post(self,request):
-        form=self.serializer_class(data=request.data)
+    def post(self, request):
+        form = self.serializer_class(data=request.data)
         if form.is_valid():
             token_ref = form.validated_data.get('token_ref')
             try:
                 get_link = Referral.objects.get(code=token_ref)
+
+                # Check if the user/IP is allowed to proceed
+                self.check_throttles(request)
+
                 Click_Referral.objects.create(referral_link=get_link)
                 return Response({'detail': 'Click to link created'}, status=status.HTTP_201_CREATED)
-            except:
+            except Referral.DoesNotExist:
                 return Response({'detail': 'Token invalid'}, status=status.HTTP_404_NOT_FOUND)
-
 
         return Response({'detail': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
 

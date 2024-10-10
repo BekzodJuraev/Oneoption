@@ -171,8 +171,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         profile=Profile.objects.create(
             username=user, email=user.email, nickname=nickname)
 
-        if ref:
-            Register_by_ref.objects.create(profile=profile, recommended_by=ref)
+
 
 
 

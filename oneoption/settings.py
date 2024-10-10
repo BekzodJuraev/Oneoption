@@ -176,8 +176,11 @@ STATIC_ROOT=os.path.join(BASE_DIR,'static')
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-       # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',  # Uncomment if needed
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '1/day',  # Allows 10 requests per minute per user/IP
+    }
 }
 
 SITE_ID = 1

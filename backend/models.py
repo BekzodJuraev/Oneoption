@@ -60,8 +60,8 @@ class Profile(Base):
 
 class Referral(Base):
     REFERRAL_TYPES = (
-        ('doxod', 'Doxod'),
-        ('oborot', 'Oborot')
+        ('doxod', 'Доля дохода'),
+        ('oborot', 'Доля оборота')
     )
     Type_enter=(
         ('main','Главная страница '),

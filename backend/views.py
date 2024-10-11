@@ -301,21 +301,15 @@ class GetRefral_link(APIView):
     permission_classes = [IsAuthenticated, ]
 
     @swagger_auto_schema(
-        responses={status.HTTP_200_OK: Refferal_Ser()}
+        responses={status.HTTP_200_OK: Refferal_Ser(many=True)}
     )
 
     def get(self, request):
+        query=Referral.objects.filter(profile=self.request.user.profile)
 
-        queryset = {
-            "oborot":Referral.objects.get(profile=self.request.user.profile,referral_type='oborot').code,
-            "doxod":Referral.objects.get(profile=self.request.user.profile,referral_type='doxod').code,
-            "sub":Referral.objects.get(profile=self.request.user.profile,referral_type='sub').code
-                    }
-        serializer = self.serializer_class(data=queryset)
-        if serializer.is_valid():
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.serializer_class(query,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class Refer_list(APIView):
     authentication_classes = [TokenAuthentication]
@@ -326,7 +320,7 @@ class Refer_list(APIView):
         responses={status.HTTP_200_OK: Refferal_list_Ser(many=True)}
     )
     def get(self,request):
-        queryset = Register_by_ref.objects.filter(recommended_by__profile=self.request.user.profile,user_broker__isnull=False)
+        queryset = Userbroker.objects.filter(broker_ref__profile=self.request.user.profile,user_broker__isnull=False)
         email = request.query_params.get('email')
         id = request.query_params.get('id')
         if email:

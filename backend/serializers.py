@@ -75,10 +75,14 @@ class Refferal_list_Ser(serializers.ModelSerializer):
     class Meta:
         model=Profile
         fields=['id','email']
-class Refferal_Ser(serializers.Serializer):
-    oborot=serializers.UUIDField()
-    doxod = serializers.UUIDField()
-    sub = serializers.UUIDField()
+class Refferal_Ser(serializers.ModelSerializer):
+    type_display = serializers.CharField(source='get_type_display', read_only=True)
+    referral_type = serializers.CharField(source='get_referral_type_display', read_only=True)
+
+    class Meta:
+        model=Referral
+        fields=['code','type_display','referral_type',]
+
 
 
 

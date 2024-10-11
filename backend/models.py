@@ -24,6 +24,9 @@ class Profile(Base):
     income_doxod = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total=models.DecimalField(max_digits=10, decimal_places=2, default=0)
     photo = models.ImageField()
+    sub_ref = models.UUIDField(default=uuid.uuid4, unique=True)
+    recommended_by_partner = models.ForeignKey("Profile", on_delete=models.CASCADE, related_name='register_by_ref_partner',
+                                   null=True, blank=True)
     # broker_ref = models.ForeignKey(Userbroker, on_delete=models.CASCADE, related_name='register_by_ref_user_broker',
     #                                null=True, blank=True)
 
@@ -55,14 +58,20 @@ class Profile(Base):
         return self.email
 
 
-class Referral(models.Model):
+class Referral(Base):
     REFERRAL_TYPES = (
         ('doxod', 'Doxod'),
-        ('oborot', 'Oborot'),
-        ('sub', 'Sub'),
+        ('oborot', 'Oborot')
+    )
+    Type_enter=(
+        ('main','Главная страница '),
+        ('register',' Ссылка на регистрацию'),
+        ('android',' Ссылка на Android '),
+        ('fast',' Быстрый вход в платформу')
     )
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE,related_name='referal')
     code = models.UUIDField(default=uuid.uuid4, unique=True)
+    type=models.CharField(max_length=20,choices=Type_enter)
     referral_type = models.CharField(max_length=20, choices=REFERRAL_TYPES)
 
 

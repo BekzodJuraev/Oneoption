@@ -278,7 +278,7 @@ class Profile_View(APIView):
         serializer = UpdateProfile(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message': 'Profile updated'}, status=status.HTTP_200_OK)
+            return Response({'message': request.data or "Not updated"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
@@ -289,7 +289,7 @@ class Profile_View(APIView):
         serializer = SetPictures(profile, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message': 'photo updated'}, status=status.HTTP_200_OK)
+            return Response({'message': request.data or "Not updated"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -179,7 +179,7 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.SessionAuthentication',  # Uncomment if needed
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'user': '1/day',  # Allows 10 requests per minute per user/IP
+        'user': '2/day',  # Allows 10 requests per minute per user/IP
     }
 }
 

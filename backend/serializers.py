@@ -70,11 +70,11 @@ class Refferal_count_all(serializers.Serializer):
 
 class Refferal_list_Ser(serializers.ModelSerializer):
     pass
-    # email=serializers.EmailField(source='user_broker.email',required=False)
-    # id=serializers.IntegerField(source='user_broker.id',required=False)
-    # class Meta:
-    #     model=Register_by_ref
-    #     fields=['id','email']
+    email=serializers.EmailField(source='user_broker.email',required=False)
+    id=serializers.IntegerField(source='user_broker.id',required=False)
+    class Meta:
+        model=Profile
+        fields=['id','email']
 class Refferal_Ser(serializers.Serializer):
     oborot=serializers.UUIDField()
     doxod = serializers.UUIDField()
@@ -87,10 +87,10 @@ class GetProfile(serializers.ModelSerializer):
 
     class Meta:
         model=Profile
-        fields = ['nickname','email','photo','level','ftd_count']
+        fields = ['nickname','email','photo','level','ftd_count','sub_ref']
 
 class UpdateProfile(serializers.ModelSerializer):
-    email=serializers.EmailField(required=False)
+
     class Meta:
         model=Profile
         fields = ['nickname','email']
@@ -153,7 +153,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         if token_ref:
             try:
-                ref = Referral.objects.get(code=token_ref)
+                ref = Profile.objects.get(sub_ref=token_ref)
             except Referral.DoesNotExist:
                 raise serializers.ValidationError({"token_ref": "Token does not exist."})
         else:
@@ -169,7 +169,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         # Create the user's profile with or without referral
         profile=Profile.objects.create(
-            username=user, email=user.email, nickname=nickname)
+            username=user, email=user.email, nickname=nickname,recommended_by_partner=ref)
 
 
 

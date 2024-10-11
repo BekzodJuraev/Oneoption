@@ -36,9 +36,15 @@ def create_walet(sender,instance,*args,**kwargs):
 @receiver(post_save,sender=Profile)
 def create_profile_for_user(sender,instance,created,*args,**kwargs):
     if created:
-        Referral.objects.get_or_create(profile=instance, referral_type='doxod')
-        Referral.objects.get_or_create(profile=instance, referral_type='oborot')
-        Referral.objects.get_or_create(profile=instance, referral_type='sub')
+        Referral.objects.get_or_create(profile=instance, referral_type='doxod',type='main')
+        Referral.objects.get_or_create(profile=instance, referral_type='doxod', type='register')
+        Referral.objects.get_or_create(profile=instance, referral_type='doxod', type='fast')
+        Referral.objects.get_or_create(profile=instance, referral_type='doxod', type='android')
+        Referral.objects.get_or_create(profile=instance, referral_type='oborot', type='main')
+        Referral.objects.get_or_create(profile=instance, referral_type='oborot', type='register')
+        Referral.objects.get_or_create(profile=instance, referral_type='oborot', type='fast')
+        Referral.objects.get_or_create(profile=instance, referral_type='oborot', type='android')
+
     # if instance.recommended_by and hasattr(instance.recommended_by, 'profile') and instance.deposit > 0:
     #     FTD.objects.get_or_create(
     #         profile=instance,

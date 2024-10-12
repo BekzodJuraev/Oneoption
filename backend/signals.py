@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from .models import Profile,Referral,FTD,Wallet
+from broker.models import Userbroker
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
 import requests
@@ -32,6 +33,37 @@ def create_walet(sender,instance,*args,**kwargs):
 
 
 
+@receiver(post_save,sender=Userbroker)
+def create_ftd(sender,instance,created,*args,**kwargs):
+    if instance.broker_ref and hasattr(instance.broker_ref, 'profile') and instance.deposit >0:
+        FTD.objects.get_or_create(
+                user_broker=instance,
+                defaults={
+                    'recommended_by': instance.broker_ref.profile,
+                    'ftd': instance.deposit
+                }
+            )
+        ftd = FTD.objects.filter(recommended_by=instance.broker_ref.profile).count()
+        profile = instance.broker_ref.profile
+        new_level = profile.level
+
+
+
+        if ftd > 299:
+            new_level = 5
+        elif ftd > 199:
+            new_level = 4
+        elif ftd > 99:
+            new_level = 3
+        elif ftd > 49:
+            new_level = 2
+
+        if new_level != profile.level:
+            profile.level = new_level
+            profile.save()
+
+
+
 
 @receiver(post_save,sender=Profile)
 def create_profile_for_user(sender,instance,created,*args,**kwargs):
@@ -58,19 +90,19 @@ def create_profile_for_user(sender,instance,created,*args,**kwargs):
     #     profile=instance.recommended_by.profile
     #     new_level = profile.level
     #
-    #     if ftd > 299:
-    #         new_level = 5
-    #     elif ftd > 199:
-    #         new_level = 4
-    #     elif ftd > 99:
-    #         new_level = 3
-    #     elif ftd > 49:
-    #         new_level = 2
-    #
-    #
-    #     if new_level != profile.level:
-    #         profile.level = new_level
-    #         profile.save()
+        if ftd > 299:
+            new_level = 5
+        elif ftd > 199:
+            new_level = 4
+        elif ftd > 99:
+            new_level = 3
+        elif ftd > 49:
+            new_level = 2
+
+
+        if new_level != profile.level:
+            profile.level = new_level
+            profile.save()
 
 
 

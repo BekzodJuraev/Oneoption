@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 import pika
 from broker.models import Userbroker
-from backend.models import Referral,Register_by_ref
+from backend.models import Referral
 import json
 
 class Command(BaseCommand):

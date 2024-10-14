@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 from django.db import connection
 from django.db import models
 from rest_framework.throttling import UserRateThrottle
-
+from django.db import IntegrityError
 from rest_framework.exceptions import ValidationError
 from broker.models import Userbroker
 from drf_yasg.utils import swagger_auto_schema
@@ -712,6 +712,19 @@ class GetWalletType(APIView):
             return Response({'detail': 'Added Wallet', 'data': serializer.data}, status=status.HTTP_201_CREATED)
         except ValueError as e:
             raise ValidationError({"wallet_address": str(e)}, code=status.HTTP_400_BAD_REQUEST)
+        except IntegrityError as e:
+
+            if 'wallet' in str(e):  # Check if the error mentions the 'wallet' field
+                raise ValidationError({"type_wallet": "A wallet with this type wallet already exists."},
+                                      code=status.HTTP_400_BAD_REQUEST)
+            else:
+
+                raise ValidationError({"detail": "Database integrity error occurred."},
+                                      code=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+
+            return Response({'detail': 'An error occurred', 'error': str(e)},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class Withdraw(APIView):
     permission_classes = [IsAuthenticated]
@@ -726,14 +739,37 @@ class Withdraw(APIView):
         serializer = self.serializer_class(query, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: WithdrawSerPOST()}
+    )
+
     def post(self,request):
         profile=request.user.profile
         serializer = WithdrawSerPOST(data=request.data)
         if serializer.is_valid():
-            amount=serializer.validated_data['amount']
-            wallet=serializer.validated_data['wallet']
-            get_profile=Wallet.objects.filter(profile=profile,type_wallet__name=wallet).first()
+            amount = serializer.validated_data['amount']
+            wallet = serializer.validated_data['wallet']
 
+            try:
+                # Retrieve the wallet for the user's profile
+                get_profile = Wallet.objects.get(profile=profile, type_wallet__name=wallet)
+
+                if profile.total_income >= amount:
+
+                    profile.total_income = F('total_income') - amount
+                    profile.save()
+
+
+
+                    return Response({'detail': 'Withdrawal successful', 'data': serializer.data},
+                                    status=status.HTTP_200_OK)
+                else:
+                    return Response({"error": "Not enough money"}, status=status.HTTP_400_BAD_REQUEST)
+
+            except Wallet.DoesNotExist:
+                return Response({"error": "Wallet not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 

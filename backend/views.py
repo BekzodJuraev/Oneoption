@@ -22,7 +22,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -320,13 +320,13 @@ class Refer_list(APIView):
         responses={status.HTTP_200_OK: Refferal_list_Ser(many=True)}
     )
     def get(self,request):
-        queryset = Userbroker.objects.filter(broker_ref__profile=self.request.user.profile,user_broker__isnull=False)
+        queryset = Userbroker.objects.filter(broker_ref__profile=self.request.user.profile)
         email = request.query_params.get('email')
         id = request.query_params.get('id')
         if email:
-            queryset = queryset.filter(user_broker__email__icontains=email)
+            queryset = queryset.filter(email__icontains=email)
         if id:
-            queryset = queryset.filter(user_broker__id=id)
+            queryset = queryset.filter(id=id)
 
         serializer = self.serializer_class(queryset,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -439,13 +439,16 @@ class GetMain(APIView):
     def get(self,request):
         profile = request.user.profile
         click_all=Click_Referral.objects.filter(referral_link__profile=profile).count()
+
+        oborot=0
+        pl=0
         register_count=Userbroker.objects.filter(
-            broker_ref__profile=profile)
+            broker_ref__profile=profile).count()
         ftd=FTD.objects.filter(recommended_by=profile).aggregate(ftd_sum=Sum('ftd'),count=Count('id'))
 
-        witdraw_ref=Profile.objects.filter(recommended_by__profile=profile).aggregate(witdraw_ref=Sum('withdraw'))['witdraw_ref']
-
-        oborot=Profile.objects.filter(recommended_by__profile=profile).aggregate(oborot=Sum('total'))['oborot']
+        witdraw_ref=Userbroker.objects.filter(broker_ref__profile=profile).aggregate(witdraw_ref=Sum('withdraw'))['witdraw_ref']
+        # #oborot=Userbroker.objects.filter(recommended_by__profile=profile).aggregate(oborot=Sum('total'))['oborot']
+        deposit=Userbroker.objects.filter(broker_ref__profile=profile).aggregate(deposit=Sum('deposit'))['deposit']
 
 
 
@@ -454,10 +457,11 @@ class GetMain(APIView):
         queryset={
             "all_click":click_all,
             "register_count":register_count,
-            "deposit":profile.deposit,
+            "deposit":deposit,
             'ftd_count':ftd['count'],
-            'ftd_sum':ftd['ftd_sum'] or 0,
-            'witdraw_ref':witdraw_ref or 0,
+            'ftd_sum':ftd['ftd_sum'] or 0.00,
+            'witdraw_ref': witdraw_ref or 0.00,
+            'pl':pl,
             'oborot':oborot or 0
         }
         serializer = self.serializer_class(queryset)
@@ -723,7 +727,12 @@ class Withdraw(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self,request):
-        pass
+        profile=request.user.profile
+        serializer = WithdrawSerPOST(data=request.data)
+        if serializer.is_valid():
+            amount=serializer.validated_data['amount']
+            wallet=serializer.validated_data['wallet']
+            get_profile=Wallet.objects.filter(profile=profile,type_wallet__name=wallet).first()
 
 
 
@@ -731,6 +740,7 @@ class Withdraw(APIView):
 
 
 
-def index(request):
-    #user=UserProfile.objects.all()
-    return render(request,'google.html')
+
+
+
+

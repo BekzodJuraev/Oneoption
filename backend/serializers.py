@@ -5,6 +5,15 @@ from .models import Profile,Referral,Wallet,Wallet_Type
 
 from broker.models import Userbroker
 
+class WithdrawSerPOST(serializers.Serializer):
+    wallet=serializers.CharField()
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+
+
+
+
+
 class WithdrawSer(serializers.Serializer):
     wallet=serializers.CharField(source='type_wallet__name')
 
@@ -57,9 +66,11 @@ class GetProfile_main(serializers.ModelSerializer):
     ftd_sum=serializers.DecimalField(max_digits=10, decimal_places=2)
     witdraw_ref=serializers.DecimalField(max_digits=10, decimal_places=2)
     oborot=serializers.DecimalField(max_digits=10, decimal_places=2)
+    pl = serializers.DecimalField(max_digits=10, decimal_places=2)
+    deposit=serializers.DecimalField(max_digits=10, decimal_places=2)
     class Meta:
         model=Profile
-        fields=['all_click','register_count','deposit','ftd_count','ftd_sum','witdraw_ref','oborot']
+        fields=['all_click','register_count','deposit','ftd_count','ftd_sum','witdraw_ref','pl','oborot']
 class Refferal_count_all_(serializers.Serializer):
     count=serializers.IntegerField()
     day=serializers.DateField()
@@ -69,12 +80,9 @@ class Refferal_count_all(serializers.Serializer):
     hour=serializers.DateTimeField()
 
 class Refferal_list_Ser(serializers.ModelSerializer):
-    pass
-    email=serializers.EmailField(source='user_broker.email',required=False)
-    id=serializers.IntegerField(source='user_broker.id',required=False)
     class Meta:
-        model=Profile
-        fields=['id','email']
+        model=Userbroker
+        fields=['id','email','deposit','withdraw']
 class Refferal_Ser(serializers.ModelSerializer):
     type_display = serializers.CharField(source='get_type_display', read_only=True)
     referral_type = serializers.CharField(source='get_referral_type_display', read_only=True)

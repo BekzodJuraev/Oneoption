@@ -15,7 +15,7 @@ class FTDadmin(admin.ModelAdmin):
     list_display = ['user_broker','ftd']
 @admin.register(Profile)
 class Profileadmin(admin.ModelAdmin):
-    list_display = ['username','email','deposit']
+    list_display = ['username','email']
 
 # Register your models here.
 @admin.register(PasswordReset)

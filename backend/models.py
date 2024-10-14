@@ -16,7 +16,6 @@ class Profile(Base):
     username=models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile')
     nickname = models.CharField(max_length=150)
     email = models.EmailField()
-    deposit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     withdraw=models.DecimalField(max_digits=10,decimal_places=2,default=0)
     level=models.IntegerField(default=1)
     total_income=models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -112,6 +111,11 @@ class Wallet(Base):
     type_wallet=models.ForeignKey("Wallet_Type", on_delete=models.CASCADE)
     wallet_id=models.CharField(max_length=100,unique=True)
 
+    class Meta:
+        # Ensuring that a profile can only have one wallet of each type
+        constraints = [
+            models.UniqueConstraint(fields=['profile', 'type_wallet'], name='unique_profile_type_wallet')
+        ]
 
     def __str__(self):
         return  self.type_wallet.name

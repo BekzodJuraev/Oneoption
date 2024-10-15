@@ -22,7 +22,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -332,6 +332,47 @@ class Refer_list(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class PartnerLevelView(APIView):
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: PartnerLevelSerializer(many=True)}
+    )
+
+    def get(self, request):
+        PARTNER_LEVELS = [
+            {
+                "level": 1,
+                "income_percent": "40%",
+                "turnover": "2%",
+                "deposit": "0-49",
+            },
+            {
+                "level": 2,
+                "income_percent": "50%",
+                "turnover": "3%",
+                "deposit": "50-99",
+            },
+            {
+                "level": 3,
+                "income_percent": "60%",
+                "turnover": "4%",
+                "deposit": "100-199",
+            },
+            {
+                "level": 4,
+                "income_percent": "70%",
+                "turnover": "5%",
+                "deposit": "200-250",
+            },
+            {
+                "level": 5,
+                "income_percent": "80%",
+                "turnover": "7%",
+                "deposit": "Более 300",
+            }
+        ]
+
+        serializer = PartnerLevelSerializer(PARTNER_LEVELS, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class Referall_count_daily(APIView):
     serializer_class = Refferal_count_all

@@ -79,6 +79,12 @@ class Refferal_count_all(serializers.Serializer):
     count=serializers.IntegerField()
     hour=serializers.DateTimeField()
 
+class PartnerLevelSerializer(serializers.Serializer):
+    level = serializers.IntegerField()
+    income_percent = serializers.CharField(max_length=10)
+    turnover = serializers.CharField(max_length=10)
+    deposit = serializers.CharField(max_length=20)
+
 class Refferal_list_Ser(serializers.ModelSerializer):
     flag_photo=serializers.ImageField(default="")
     nickname=serializers.CharField(default="")

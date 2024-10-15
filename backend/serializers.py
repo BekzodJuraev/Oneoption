@@ -80,9 +80,19 @@ class Refferal_count_all(serializers.Serializer):
     hour=serializers.DateTimeField()
 
 class Refferal_list_Ser(serializers.ModelSerializer):
+    flag_photo=serializers.ImageField(default="")
+    nickname=serializers.CharField(default="")
+    doxod_procent=serializers.IntegerField(default=0,min_value=0,max_value=100)
+    oborot=serializers.DecimalField(default=0,max_digits=10, decimal_places=2)
+    balance=serializers.DecimalField(default=0,max_digits=10, decimal_places=2)
+    profit=serializers.DecimalField(default=0,max_digits=10, decimal_places=2)
+
+
     class Meta:
         model=Userbroker
-        fields=['id','email','deposit','withdraw']
+        fields=['id','email','deposit','withdraw','oborot','balance','profit','doxod_procent','nickname','flag_photo']
+
+
 class Refferal_Ser(serializers.ModelSerializer):
     type_display = serializers.CharField(source='get_type_display', read_only=True)
     referral_type = serializers.CharField(source='get_referral_type_display', read_only=True)

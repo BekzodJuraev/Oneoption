@@ -286,10 +286,10 @@ class Profile_View(APIView):
     )
     def patch(self,request):
         profile = self.get_profile()
-        serializer = SetPictures(profile, data=request.data, partial=True)
+        serializer = SetPictures(profile, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'message': request.data or "Not updated"}, status=status.HTTP_200_OK)
+            return Response({'message': "Photo updated"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

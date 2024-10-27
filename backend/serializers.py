@@ -53,12 +53,12 @@ class GetProfile_main_chart_(serializers.Serializer):
     clicks=serializers.IntegerField()
     register_count=serializers.IntegerField()
     ftd_count = serializers.IntegerField()
-    day=serializers.DateField(source='created_at__date')
+    date=serializers.DateField(source='created_at__date')
 class GetProfile_main_chart(serializers.Serializer):
     clicks=serializers.IntegerField()
     register_count=serializers.IntegerField()
     ftd_count=serializers.IntegerField()
-    hour=serializers.DateTimeField()
+    date=serializers.DateTimeField()
 class GetProfile_main(serializers.ModelSerializer):
     all_click=serializers.IntegerField()
     register_count=serializers.IntegerField()
@@ -73,11 +73,11 @@ class GetProfile_main(serializers.ModelSerializer):
         fields=['all_click','register_count','deposit','ftd_count','ftd_sum','witdraw_ref','pl','oborot']
 class Refferal_count_all_(serializers.Serializer):
     count=serializers.IntegerField()
-    day=serializers.DateField()
+    date=serializers.DateField()
 
 class Refferal_count_all(serializers.Serializer):
     count=serializers.IntegerField()
-    hour=serializers.DateTimeField()
+    date=serializers.DateTimeField()
 
 class PartnerLevelSerializer(serializers.Serializer):
     level = serializers.IntegerField()

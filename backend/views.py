@@ -382,7 +382,7 @@ class Referall_count_daily(APIView):
         responses={status.HTTP_200_OK: Refferal_count_all(many=True)}
     )
     def get(self,request):
-        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(hours=24)).annotate(hour=TruncHour('created_at')).values("hour").annotate(count=Count('id')).order_by('hour')
+        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(hours=24)).annotate(date=TruncHour('created_at')).values("date").annotate(count=Count('id')).order_by('date')
         serializer = self.serializer_class(queryset,many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -419,7 +419,7 @@ class Referall_count_weekly(APIView):
         # Convert the data to a list for serialization
         response_data = [
             {
-                'day': date,
+                'date': date,
                 'count': values['click_count']
             }
             for date, values in data.items()
@@ -459,7 +459,7 @@ class Referall_count_monthly(APIView):
         # Convert the data to a list for serialization
         response_data = [
             {
-                'day': date,
+                'date': date,
                 'count': values['click_count']
             }
             for date, values in data.items()
@@ -558,7 +558,7 @@ class GetMain_chart_daily(APIView):
         # Create the queryset-like structure for the serializer
         queryset = [
             {
-                'hour': hour,
+                'date': hour,
                 'clicks': values['clicks'],
                 'register_count': values['registrations'],
                 'ftd_count': values['ftd_count']

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Base(models.Model):
     created_at = models.DateTimeField(auto_now_add=True,null=True)
@@ -17,13 +18,14 @@ class Profile(Base):
     nickname = models.CharField(max_length=150)
     email = models.EmailField()
     withdraw=models.DecimalField(max_digits=10,decimal_places=2,default=0)
-    level=models.IntegerField(default=1)
+    level=models.IntegerField(default=1,validators=[MinValueValidator(1), MaxValueValidator(5)])
     total_income=models.DecimalField(max_digits=10, decimal_places=2, default=0)
     income_oborot = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     income_doxod = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total=models.DecimalField(max_digits=10, decimal_places=2, default=0)
     photo = models.ImageField()
     sub_ref = models.UUIDField(default=uuid.uuid4, unique=True)
+    next_level=models.IntegerField(default=50)
     recommended_by_partner = models.ForeignKey("Profile", on_delete=models.CASCADE, related_name='register_by_ref_partner',
                                    null=True, blank=True)
     # broker_ref = models.ForeignKey(Userbroker, on_delete=models.CASCADE, related_name='register_by_ref_user_broker',

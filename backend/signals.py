@@ -48,15 +48,17 @@ def create_ftd(sender,instance,created,*args,**kwargs):
         new_level = profile.level
 
 
-
         if ftd > 299:
             new_level = 5
         elif ftd > 199:
             new_level = 4
+
         elif ftd > 99:
             new_level = 3
+            next_level = 251
         elif ftd > 49:
             new_level = 2
+            next_level=100
 
         if new_level != profile.level:
             profile.level = new_level

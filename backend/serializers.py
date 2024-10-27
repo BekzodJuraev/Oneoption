@@ -68,6 +68,7 @@ class GetProfile_main(serializers.ModelSerializer):
     oborot=serializers.DecimalField(max_digits=10, decimal_places=2)
     pl = serializers.DecimalField(max_digits=10, decimal_places=2)
     deposit=serializers.DecimalField(max_digits=10, decimal_places=2)
+
     class Meta:
         model=Profile
         fields=['all_click','register_count','deposit','ftd_count','ftd_sum','witdraw_ref','pl','oborot']
@@ -115,7 +116,7 @@ class GetProfile(serializers.ModelSerializer):
 
     class Meta:
         model=Profile
-        fields = ['nickname','email','photo','level','ftd_count','sub_ref']
+        fields = ['nickname','email','photo','level','ftd_count','sub_ref','next_level']
 
 class UpdateProfile(serializers.ModelSerializer):
 

@@ -261,7 +261,7 @@ class Profile_View(APIView):
     )
     def get(self,request):
         ftd_count = FTD.objects.filter(recommended_by=self.get_profile()).count()
-        get_profile=Profile.objects.only('nickname','email','photo','level').annotate(ftd_count=Value(ftd_count)).get(username=request.user)
+        get_profile=Profile.objects.only('nickname','email','photo','level','next_level').annotate(ftd_count=Value(ftd_count)).get(username=request.user)
 
 
 
@@ -389,7 +389,7 @@ class Referall_count_daily(APIView):
 
 class Referall_count_weekly(APIView):
     serializer_class = Refferal_count_all_
-    permission_classes = [IsAuthenticated, ]
+    permission_classes = [IsAuthenticated,]
 
     @swagger_auto_schema(
         responses={status.HTTP_200_OK: Refferal_count_all_(many=True)}

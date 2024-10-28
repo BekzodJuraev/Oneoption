@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.db import connection
 from django.db import models
+
 from rest_framework.throttling import UserRateThrottle
 from django.db import IntegrityError
 from rest_framework.exceptions import ValidationError
@@ -260,7 +261,8 @@ class Profile_View(APIView):
         responses={status.HTTP_200_OK: GetProfile()}
     )
     def get(self,request):
-        ftd_count = FTD.objects.filter(recommended_by=self.get_profile()).count()
+        ftd_count = FTD.objects.filter(recommended_by=self.get_profile(),created_at__month=date.today().month).count()
+
         get_profile=Profile.objects.only('nickname','email','photo','level','next_level').annotate(ftd_count=Value(ftd_count)).get(username=request.user)
 
 
@@ -485,7 +487,7 @@ class GetMain(APIView):
         pl=0
         register_count=Userbroker.objects.filter(
             broker_ref__profile=profile).count()
-        ftd=FTD.objects.filter(recommended_by=profile).aggregate(ftd_sum=Sum('ftd'),count=Count('id'))
+        ftd=FTD.objects.filter(recommended_by=profile,created_at__month=date.today().month).aggregate(ftd_sum=Sum('ftd'),count=Count('id'))
 
         witdraw_ref=Userbroker.objects.filter(broker_ref__profile=profile).aggregate(witdraw_ref=Sum('withdraw'))['witdraw_ref']
         # #oborot=Userbroker.objects.filter(recommended_by__profile=profile).aggregate(oborot=Sum('total'))['oborot']

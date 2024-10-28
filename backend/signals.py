@@ -43,19 +43,22 @@ def create_ftd(sender,instance,created,*args,**kwargs):
                     'ftd': instance.deposit
                 }
             )
+
         ftd = FTD.objects.filter(recommended_by=instance.broker_ref.profile).count()
         profile = instance.broker_ref.profile
         new_level = profile.level
+        next_level=profile.next_level
 
 
         if ftd > 299:
             new_level = 5
+            next_level=300
         elif ftd > 199:
             new_level = 4
-
+            next_level = 300
         elif ftd > 99:
             new_level = 3
-            next_level = 251
+            next_level = 200
         elif ftd > 49:
             new_level = 2
             next_level=100

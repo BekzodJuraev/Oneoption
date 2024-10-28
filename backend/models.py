@@ -41,15 +41,8 @@ class Profile(Base):
 
 
 
-        # if self.pk:
-        #     current_instance=Profile.objects.get(pk=self.pk)
-        #     if current_instance.deposit > self.deposit:
-        #         amout=current_instance.deposit - self.deposit
-        #
-        #         self.withdraw += amout
 
-        #self.total += self.deposit
-        self.total_income= self.income_oborot + self.income_doxod
+
 
 
 

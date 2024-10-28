@@ -67,7 +67,7 @@ class Referral(Base):
     Type_enter=(
         ('main','Главная страница '),
         ('register',' Ссылка на регистрацию'),
-        ('android',' Ссылка на Android '),
+        #('android',' Ссылка на Android '),
         ('fast',' Быстрый вход в платформу')
     )
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE,related_name='referal')

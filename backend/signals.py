@@ -73,11 +73,11 @@ def create_profile_for_user(sender,instance,created,*args,**kwargs):
         Referral.objects.get_or_create(profile=instance, referral_type='doxod',type='main')
         Referral.objects.get_or_create(profile=instance, referral_type='doxod', type='register')
         Referral.objects.get_or_create(profile=instance, referral_type='doxod', type='fast')
-        Referral.objects.get_or_create(profile=instance, referral_type='doxod', type='android')
+        #Referral.objects.get_or_create(profile=instance, referral_type='doxod', type='android')
         Referral.objects.get_or_create(profile=instance, referral_type='oborot', type='main')
         Referral.objects.get_or_create(profile=instance, referral_type='oborot', type='register')
         Referral.objects.get_or_create(profile=instance, referral_type='oborot', type='fast')
-        Referral.objects.get_or_create(profile=instance, referral_type='oborot', type='android')
+        #Referral.objects.get_or_create(profile=instance, referral_type='oborot', type='android')
 
 
 

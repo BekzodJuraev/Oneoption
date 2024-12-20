@@ -53,11 +53,11 @@ class Change_password(APIView):
         if serializer.is_valid():
             user = request.user
             if not user.check_password(serializer.validated_data['old_password']):
-                return Response({'old_password': ['Wrong password.']}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': ['Wrong password.']}, status=status.HTTP_400_BAD_REQUEST)
 
             user.set_password(serializer.validated_data['new_password'])
             user.save()
-            return Response({'success': 'Password has been changed successfully.'}, status=status.HTTP_200_OK)
+            return Response({'message': 'Password has been changed successfully.'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -82,16 +82,16 @@ class LoginAPIView(APIView):
                 login(request, user)
                 token, created = Token.objects.get_or_create(user=user)  # Get or create a token for the user
 
-                response_data = {'detail': 'Login successful', 'token': token.key}
+                response_data = {'message': 'Login successful', 'token': token.key}
                 if next_url:
                     response_data['next'] = next_url
 
                 return Response(response_data, status=status.HTTP_200_OK)
 
             else:
-                return Response({'detail': 'Логин или пароль неверны'}, status=status.HTTP_401_UNAUTHORIZED)
+                return Response({'message': 'Логин или пароль неверны'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        return Response({'detail': 'Invalid form data'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Invalid form data'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Token_Click(APIView):
@@ -112,11 +112,11 @@ class Token_Click(APIView):
                 self.check_throttles(request)
 
                 Click_Referral.objects.create(referral_link=get_link)
-                return Response({'detail': 'Click to link created'}, status=status.HTTP_201_CREATED)
+                return Response({'message': 'Click to link created'}, status=status.HTTP_201_CREATED)
             except Referral.DoesNotExist:
-                return Response({'detail': 'Token invalid'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'message': 'Token invalid'}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({'detail': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -131,7 +131,7 @@ class RegistrationAPIView(generics.CreateAPIView):
         serializer.save()
 
 
-        return Response({'detail': 'Registration successful'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'Registration successful'}, status=status.HTTP_201_CREATED)
 
 class LogoutAPIView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -140,11 +140,10 @@ class LogoutAPIView(APIView):
     def post(self, request):
         # Delete the token to logout the user
         request.user.auth_token.delete()
-        return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)
+        return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
 
 class SocialLoginView(APIView):
     def get(self, request):
-
         return redirect('/auth/login/google-oauth2/')
 
 class SocialLoginComplete(APIView):
@@ -157,12 +156,12 @@ class SocialLoginComplete(APIView):
         if token:
             try:
                 token = Token.objects.get(key=token)
-                response_data = {'detail': 'Login successful via google', 'token': token.key}
+                response_data = {'message': 'Login successful via google', 'token': token.key}
                 return Response(response_data, status=status.HTTP_200_OK)
             except Token.DoesNotExist:
-                return Response({'detail': 'Token not found'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'Token not found'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'detail': 'Token parameter missing'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Token parameter missing'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -190,7 +189,7 @@ class RequestPasswordReset(APIView):
         try:
             user = User.objects.get(email=email)
         except ObjectDoesNotExist:
-            return Response({"error": "User with this email not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "User with this email not found"}, status=status.HTTP_404_NOT_FOUND)
 
         token_generator = PasswordResetTokenGenerator()
         token = token_generator.make_token(user)
@@ -207,7 +206,7 @@ class RequestPasswordReset(APIView):
 
 
 
-        return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+        return Response({'message': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
 
 
 
@@ -229,23 +228,23 @@ class PasswordResetConfirm(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         if reset_obj is None:
-            return Response({"error": "Invalid token or reset object not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Invalid token or reset object not found"}, status=status.HTTP_404_NOT_FOUND)
 
         try:
 
             user = User.objects.get(email=reset_obj.email)
         except User.DoesNotExist:
-            return Response({"error": "Invalid token or user does not exist"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Invalid token or user does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
         token_generator = PasswordResetTokenGenerator()
         if not token_generator.check_token(user, token):
-            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
         user.set_password(serializer.validated_data['new_password'])
         user.save()
         reset_obj.delete()
 
-        return Response({"success": "Password has been reset"}, status=status.HTTP_200_OK)
+        return Response({"message": "Password has been reset"}, status=status.HTTP_200_OK)
 
 
 class Profile_View(APIView):
@@ -500,10 +499,10 @@ class GetMain(APIView):
         queryset={
             "all_click":click_all,
             "register_count":register_count,
-            "deposit":deposit,
+            "deposit":deposit or 0,
             'ftd_count':ftd['count'],
-            'ftd_sum':ftd['ftd_sum'] or 0.00,
-            'witdraw_ref': witdraw_ref or 0.00,
+            'ftd_sum':ftd['ftd_sum'] or 0,
+            'witdraw_ref': witdraw_ref or 0,
             'pl':pl,
             'oborot':oborot or 0
         }
@@ -752,21 +751,21 @@ class GetWalletType(APIView):
             serializer = WalletPOST(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(profile=request.user.profile)
-            return Response({'detail': 'Added Wallet', 'data': serializer.data}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Added Wallet', 'data': serializer.data}, status=status.HTTP_201_CREATED)
         except ValueError as e:
-            raise ValidationError({"wallet_address": str(e)}, code=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError({"message": str(e)}, code=status.HTTP_400_BAD_REQUEST)
         except IntegrityError as e:
 
             if 'wallet' in str(e):  # Check if the error mentions the 'wallet' field
-                raise ValidationError({"type_wallet": "A wallet with this type wallet already exists."},
+                raise ValidationError({"message": "A wallet with this type wallet already exists."},
                                       code=status.HTTP_400_BAD_REQUEST)
             else:
 
-                raise ValidationError({"detail": "Database integrity error occurred."},
+                raise ValidationError({"message": "Database integrity error occurred."},
                                       code=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
 
-            return Response({'detail': 'An error occurred', 'error': str(e)},
+            return Response({'message': 'An error occurred', 'error': str(e)},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class Withdraw(APIView):
@@ -804,13 +803,13 @@ class Withdraw(APIView):
 
 
 
-                    return Response({'detail': 'Withdrawal successful', 'data': serializer.data},
+                    return Response({'message': 'Withdrawal successful', 'data': serializer.data},
                                     status=status.HTTP_200_OK)
                 else:
-                    return Response({"error": "Not enough money"}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"message": "Not enough money"}, status=status.HTTP_400_BAD_REQUEST)
 
             except Wallet.DoesNotExist:
-                return Response({"error": "Wallet not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"message": "Wallet not found"}, status=status.HTTP_404_NOT_FOUND)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

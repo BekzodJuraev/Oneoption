@@ -10,7 +10,7 @@ class CustomGoogleOAuth2(GoogleOAuth2):
 
         response = super().complete(*args, **kwargs)
         token, created = Token.objects.get_or_create(user=response)
-        Profile.objects.get_or_create(username=response, email=response.email)
+        Profile.objects.get_or_create(username=response, email=response.email,nickname=response.username)
 
         params = {
             'token': token.key

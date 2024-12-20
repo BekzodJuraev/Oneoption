@@ -184,7 +184,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             try:
                 ref = Profile.objects.get(sub_ref=token_ref)
             except Referral.DoesNotExist:
-                raise serializers.ValidationError({"token_ref": "Token does not exist."})
+                raise serializers.ValidationError({"message": "Token does not exist."})
         else:
             ref = None  # No referral if token_ref not provided
 

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+from django.db.models import F
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Base(models.Model):
@@ -120,4 +121,27 @@ class Wallet_Type(Base):
     name=models.CharField(max_length=250)
     def __str__(self):
         return  self.name
+
+class Withdraw(Base):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='withdraw_payment')
+    wallet= models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    status = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return  self.profile.email
+
+    def save(self, *args, **kwargs):
+        if self.status:
+            if self.profile.total_income >= self.amount:
+                self.profile.total_income = F('total_income') - self.amount
+                self.profile.save(update_fields=['total_income'])
+            else:
+                self.status=False
+        super().save(*args, **kwargs)
+
+
+
+
 

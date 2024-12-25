@@ -21,7 +21,7 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
-from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type
+from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type,Withdraw
 from .serializers import  \
     Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer
 from rest_framework.response import Response
@@ -768,7 +768,7 @@ class GetWalletType(APIView):
             return Response({'message': 'An error occurred', 'error': str(e)},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class Withdraw(APIView):
+class Withdraw_View(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class=WithdrawSer
 
@@ -796,14 +796,16 @@ class Withdraw(APIView):
                 # Retrieve the wallet for the user's profile
                 get_profile = Wallet.objects.get(profile=profile, type_wallet__name=wallet)
 
+
                 if profile.total_income >= amount:
+                    Withdraw.objects.create(profile=profile,wallet=get_profile,amount=amount)
 
-                    profile.total_income = F('total_income') - amount
-                    profile.save()
+                    # profile.total_income = F('total_income') - amount
+                    # profile.save()
 
 
 
-                    return Response({'message': 'Withdrawal successful', 'data': serializer.data},
+                    return Response({'message': 'Withdraw Proccessing', 'data': serializer.data},
                                     status=status.HTTP_200_OK)
                 else:
                     return Response({"message": "Not enough money"}, status=status.HTTP_400_BAD_REQUEST)

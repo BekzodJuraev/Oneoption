@@ -1,7 +1,9 @@
 from django.contrib import admin
-from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet
+from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet,Withdraw
 
-
+@admin.register(Withdraw)
+class Withdraw(admin.ModelAdmin):
+    pass
 
 @admin.register(Wallet_Type)
 class Wallet_Type(admin.ModelAdmin):

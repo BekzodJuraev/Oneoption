@@ -383,8 +383,45 @@ class Referall_count_daily(APIView):
         responses={status.HTTP_200_OK: Refferal_count_all(many=True)}
     )
     def get(self,request):
-        queryset=Click_Referral.objects.filter(referral_link__profile=self.request.user.profile,created_at__gte=timezone.now() - timedelta(hours=24)).annotate(date=TruncHour('created_at')).values("date").annotate(count=Count('id')).order_by('date')
-        serializer = self.serializer_class(queryset,many=True)
+        start_time = timezone.now() - timedelta(hours=24)
+
+
+
+        time_range = [
+            start_time + timedelta(hours=x)
+            for x in range(0, 25)  # 25 to include the current hour
+        ]
+
+        # Initialize a dictionary with default values for each hour
+        data = {
+            hour.replace(minute=0, second=0, microsecond=0): {'click_count': 0}
+            for hour in time_range
+        }
+
+        # Query the database for click data
+        queryset = Click_Referral.objects.filter(
+            referral_link__profile=request.user.profile,
+            created_at__gte=start_time
+        ).annotate(hour=TruncHour('created_at')).values('hour').annotate(count=Count('id'))
+
+
+        # Populate the data dictionary with actual click counts
+        for click in queryset:
+            hour = click['hour']
+
+            data[hour]['click_count'] = click['count']
+
+        # Convert the data to a list for serialization
+        response_data = [
+            {
+                'date': hour,
+                'count': values['click_count']
+            }
+            for hour, values in data.items()
+        ]
+
+
+        serializer = self.serializer_class(response_data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -517,47 +554,48 @@ class GetMain_chart_daily(APIView):
         responses={status.HTTP_200_OK: GetProfile_main_chart(many=True)}
     )
 
-    def get(self,reqeust):
-        profile=reqeust.user.profile
+    def get(self,request):
+        profile = request.user.profile
+        start_time = timezone.now() - timedelta(hours=24)
+
+        # Clicks aggregated by hour
         clicks = Click_Referral.objects.filter(
             referral_link__profile=profile,
-            created_at__gte=timezone.now() - timedelta(hours=24)
+            created_at__gte=start_time
         ).annotate(hour=TruncHour('created_at')).values('hour').annotate(click_count=Count('id')).order_by('hour')
 
-        # Registrations, aggregated by hour for the past 24 hours
+        # Registrations aggregated by hour
         registrations = Userbroker.objects.filter(
             broker_ref__profile=profile,
-            created_at__gte=timezone.now() - timedelta(hours=24)
+            created_at__gte=start_time
         ).annotate(hour=TruncHour('created_at')).values('hour').annotate(register_count=Count('id')).order_by('hour')
 
-        # FTDs, aggregated by hour for the past 24 hours
-        ftd_count = FTD.objects.filter(
+        # FTDs aggregated by hour
+        ftds = FTD.objects.filter(
             recommended_by=profile,
-            created_at__gte=timezone.now() - timedelta(hours=24)
+            created_at__gte=start_time
         ).annotate(hour=TruncHour('created_at')).values('hour').annotate(ftd_count=Count('id')).order_by('hour')
 
-        # Merge the data
-        data = {}
-        for click in clicks:
-            hour = click['hour']
-            data[hour] = {'clicks': click['click_count'], 'registrations': 0, 'ftd_count': 0}
+        # Initialize data dictionary for 24 hours
+        data = {
+            hour.replace(minute=0, second=0, microsecond=0): {
+                'clicks': 0, 'registrations': 0, 'ftd_count': 0
+            }
+            for hour in [start_time + timedelta(hours=i) for i in range(25)]
+        }
 
-        for registration in registrations:
-            hour = registration['hour']
-            if hour in data:
-                data[hour]['registrations'] = registration['register_count']
-            else:
-                data[hour] = {'clicks': 0, 'registrations': registration['register_count'], 'ftd_count': 0}
+        # Populate data dictionary with actual counts
+        for entry in clicks:
+            data[entry['hour']]['clicks'] = entry['click_count']
 
-        for ftd in ftd_count:
-            hour = ftd['hour']
-            if hour in data:
-                data[hour]['ftd_count'] = ftd['ftd_count']
-            else:
-                data[hour] = {'clicks': 0, 'registrations': 0, 'ftd_count': ftd['ftd_count']}
+        for entry in registrations:
+            data[entry['hour']]['registrations'] = entry['register_count']
 
-        # Create the queryset-like structure for the serializer
-        queryset = [
+        for entry in ftds:
+            data[entry['hour']]['ftd_count'] = entry['ftd_count']
+
+        # Prepare response data
+        response_data = [
             {
                 'date': hour,
                 'clicks': values['clicks'],
@@ -567,8 +605,8 @@ class GetMain_chart_daily(APIView):
             for hour, values in data.items()
         ]
 
-        # Pass the queryset to the serializer with many=True
-        serializer = self.serializer_class(queryset, many=True)
+        # Serialize response data
+        serializer = self.serializer_class(response_data, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 class GetMain_chart_weekly(APIView):
     serializer_class=GetProfile_main_chart_

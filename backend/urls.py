@@ -26,7 +26,8 @@ urlpatterns=[
     path('wallet/list',views.GetWallet.as_view(),name='wallet_list'),
     path('wallet/',views.GetWalletType.as_view(),name='wallet'),
     path('withdraw/',views.Withdraw_View.as_view(),name='withdraw'),
-    path('level/list',views.PartnerLevelView.as_view(),name='level_list')
+    path('level/list',views.PartnerLevelView.as_view(),name='level_list'),
+    path('register/broker',views.RegisterBrokerView.as_view(),name='broker_register')
 
 
 ]

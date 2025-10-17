@@ -36,6 +36,11 @@ class WalletPOST(serializers.ModelSerializer):
         return wallet
 
 
+class RegisterBroker(serializers.Serializer):
+    token=serializers.UUIDField()
+    email=serializers.EmailField()
+
+
 class GetWallet_type(serializers.ModelSerializer):
     class Meta:
         model=Wallet_Type

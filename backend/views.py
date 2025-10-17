@@ -23,7 +23,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type,Withdraw
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -859,6 +859,29 @@ class Withdraw_View(APIView):
 
 
 
+
+class RegisterBrokerView(APIView):
+    serializer_class = RegisterBroker
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: RegisterBroker()}
+    )
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            token = serializer.validated_data['token']
+            email = serializer.validated_data['email']
+
+            try:
+                broker = Referral.objects.get(code=token)
+            except Referral.DoesNotExist:
+                return Response({'error': 'Invalid broker token'}, status=400)
+
+            Userbroker.objects.create(email=email, broker_ref=broker)
+
+            return Response({'message': 'Broker registered successfully'}, status=201)
+
+        return Response(serializer.errors, status=400)
 
 
 

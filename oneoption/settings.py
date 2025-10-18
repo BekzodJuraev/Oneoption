@@ -186,6 +186,8 @@ REST_FRAMEWORK = {
 SITE_ID = 1
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://one-option.onrender.com",
+    "http://one-option.onrender.com"
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True

@@ -17,7 +17,7 @@ class CustomGoogleOAuth2(GoogleOAuth2):
         }
 
         # Reverse the URL for the view
-        url = f"http://localhost:5173/google/complete/"
+        url = f"https://one-option.onrender.com/google/complete/"
 
         # Add the query parameters to the URL
         url_with_params = f'{url}?{urlencode(params)}'

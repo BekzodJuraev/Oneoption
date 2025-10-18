@@ -195,7 +195,7 @@ class RequestPasswordReset(APIView):
         token = token_generator.make_token(user)
         reset = PasswordReset(email=email, token=token)
         reset.save()
-        send=f"https://localhost:5173/auth/password/reset/confirm/{token}/"
+        send=f"https://one-option.onrender.com/auth/password/reset/confirm/{token}/"
         send_mail(
             'Password reset',
             f'Recovery link {send}',

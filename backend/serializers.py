@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Profile,Referral,Wallet,Wallet_Type
+from .models import Profile,Referral,Wallet,Wallet_Type,FTD
 
 from broker.models import Userbroker
 
@@ -39,7 +39,18 @@ class WalletPOST(serializers.ModelSerializer):
 class RegisterBroker(serializers.Serializer):
     token=serializers.UUIDField()
     email=serializers.EmailField()
+    nickname=serializers.CharField()
+    country_code=serializers.CharField()
 
+class FTD_BrokerSer(serializers.ModelSerializer):
+    ftd = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        min_value=0.01,
+    )
+    class Meta:
+        model=FTD
+        fields=['ftd']
 
 class GetWallet_type(serializers.ModelSerializer):
     class Meta:
@@ -92,8 +103,6 @@ class PartnerLevelSerializer(serializers.Serializer):
     deposit = serializers.CharField(max_length=20)
 
 class Refferal_list_Ser(serializers.ModelSerializer):
-    flag_photo=serializers.ImageField(default="")
-    nickname=serializers.CharField(default="")
     doxod_procent=serializers.IntegerField(default=0,min_value=0,max_value=100)
     oborot=serializers.DecimalField(default=0,max_digits=10, decimal_places=2)
     balance=serializers.DecimalField(default=0,max_digits=10, decimal_places=2)
@@ -102,7 +111,7 @@ class Refferal_list_Ser(serializers.ModelSerializer):
 
     class Meta:
         model=Userbroker
-        fields=['id','email','deposit','withdraw','oborot','balance','profit','doxod_procent','nickname','flag_photo']
+        fields=['id','email','deposit','withdraw','oborot','balance','profit','doxod_procent','nickname','country_code']
 
 
 class Refferal_Ser(serializers.ModelSerializer):

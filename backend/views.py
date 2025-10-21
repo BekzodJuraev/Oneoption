@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.db import connection
 from django.db import models
-
+from django.shortcuts import get_object_or_404
 from rest_framework.throttling import UserRateThrottle
 from django.db import IntegrityError
 from rest_framework.exceptions import ValidationError
@@ -23,7 +23,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type,Withdraw
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -868,20 +868,71 @@ class RegisterBrokerView(APIView):
     )
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
+
         if serializer.is_valid():
             token = serializer.validated_data['token']
             email = serializer.validated_data['email']
+            nickname = serializer.validated_data['nickname']
+            country_code = serializer.validated_data['country_code']
 
+            # Проверяем, существует ли брокер по токену
             try:
                 broker = Referral.objects.get(code=token)
             except Referral.DoesNotExist:
                 return Response({'error': 'Invalid broker token'}, status=400)
 
-            Userbroker.objects.create(email=email, broker_ref=broker)
+            # Проверяем, есть ли уже Userbroker с таким email
+            if Userbroker.objects.filter(email=email).exists():
+                return Response(
+                    {'error': 'Userbroker with this email already exists'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-            return Response({'message': 'Broker registered successfully'}, status=201)
 
-        return Response(serializer.errors, status=400)
+            Userbroker.objects.create(
+                email=email,
+                broker_ref=broker,
+                nickname=nickname,
+                country_code=country_code
+            )
 
+            return Response({'message': 'Broker registered successfully'}, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class FTD_BrokerView(APIView):
+    serializer_class = FTD_BrokerSer
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: FTD_BrokerSer(),
+            status.HTTP_201_CREATED: FTD_BrokerSer(),
+        }
+    )
+    def post(self, request, token):
+        """Create FTD only if not already exists for this user_broker."""
+        ref = get_object_or_404(Userbroker, broker_ref__code=token)
+
+        # check if FTD already exists for this broker
+        existing_ftd = FTD.objects.filter(user_broker=ref).first()
+        if existing_ftd:
+            serializer = self.serializer_class(existing_ftd)
+            return Response(
+                {"detail": "FTD already exists.", "data": serializer.data},
+                status=status.HTTP_200_OK
+            )
+
+        # create new FTD if not exists
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save(
+                user_broker=ref,
+                recommended_by=ref.broker_ref.profile
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

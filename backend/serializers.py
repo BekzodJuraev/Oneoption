@@ -41,6 +41,7 @@ class RegisterBroker(serializers.Serializer):
     email=serializers.EmailField()
     nickname=serializers.CharField()
     country_code=serializers.CharField()
+    broker_user_id=serializers.IntegerField()
 
 class FTD_BrokerSer(serializers.ModelSerializer):
     ftd = serializers.DecimalField(
@@ -48,6 +49,7 @@ class FTD_BrokerSer(serializers.ModelSerializer):
         decimal_places=2,
         min_value=0.01,
     )
+
     class Meta:
         model=FTD
         fields=['ftd']
@@ -102,11 +104,20 @@ class PartnerLevelSerializer(serializers.Serializer):
     turnover = serializers.CharField(max_length=10)
     deposit = serializers.CharField(max_length=20)
 
+
+class Update_Broker_Ser(serializers.ModelSerializer):
+
+    class Meta:
+        model=Userbroker
+        fields=['deposit','withdraw','oborot','balance','profit','doxodnost']
+
+
 class Refferal_list_Ser(serializers.ModelSerializer):
-    doxod_procent=serializers.IntegerField(default=0,min_value=0,max_value=100)
+    doxod_procent=serializers.IntegerField(source='doxodnost',default=0,min_value=0,max_value=100)
     oborot=serializers.DecimalField(default=0,max_digits=10, decimal_places=2)
     balance=serializers.DecimalField(default=0,max_digits=10, decimal_places=2)
     profit=serializers.DecimalField(default=0,max_digits=10, decimal_places=2)
+    id = serializers.IntegerField(source='broker_user_id', read_only=True)
 
 
     class Meta:

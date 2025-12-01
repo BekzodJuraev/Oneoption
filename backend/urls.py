@@ -28,7 +28,9 @@ urlpatterns=[
     path('withdraw/',views.Withdraw_View.as_view(),name='withdraw'),
     path('level/list',views.PartnerLevelView.as_view(),name='level_list'),
     path('broker/register/',views.RegisterBrokerView.as_view(),name='broker_register'),
-    path('broker/ftd/<uuid:token>/', views.FTD_BrokerView.as_view())
+    path('broker/update/<uuid:token>/<int:user_id>',views.UpdateBrokerView.as_view()),
+    path('broker/ftd/<uuid:token>/<int:user_id>', views.FTD_BrokerView.as_view()),
+
 
 
 ]

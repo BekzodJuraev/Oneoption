@@ -23,7 +23,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type,Withdraw
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer,Update_Broker_Ser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -519,14 +519,14 @@ class GetMain(APIView):
         profile = request.user.profile
         click_all=Click_Referral.objects.filter(referral_link__profile=profile).count()
 
-        oborot=0
-        pl=0
+
+        pl=Userbroker.objects.filter(broker_ref__profile=profile).aggregate(profit=Sum('profit'))['profit']
         register_count=Userbroker.objects.filter(
             broker_ref__profile=profile).count()
         ftd=FTD.objects.filter(recommended_by=profile,created_at__month=date.today().month).aggregate(ftd_sum=Sum('ftd'),count=Count('id'))
 
         witdraw_ref=Userbroker.objects.filter(broker_ref__profile=profile).aggregate(witdraw_ref=Sum('withdraw'))['witdraw_ref']
-        # #oborot=Userbroker.objects.filter(recommended_by__profile=profile).aggregate(oborot=Sum('total'))['oborot']
+        oborot=Userbroker.objects.filter(broker_ref__profile=profile).aggregate(oborot=Sum('oborot'))['oborot']
         deposit=Userbroker.objects.filter(broker_ref__profile=profile).aggregate(deposit=Sum('deposit'))['deposit']
 
 
@@ -864,7 +864,7 @@ class RegisterBrokerView(APIView):
     serializer_class = RegisterBroker
 
     @swagger_auto_schema(
-        responses={status.HTTP_200_OK: RegisterBroker()}
+        responses={status.HTTP_201_CREATED: RegisterBroker()}
     )
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -874,31 +874,54 @@ class RegisterBrokerView(APIView):
             email = serializer.validated_data['email']
             nickname = serializer.validated_data['nickname']
             country_code = serializer.validated_data['country_code']
+            broker_user_id = serializer.validated_data['broker_user_id']
 
-            # Проверяем, существует ли брокер по токену
+            # 1. Find Partner Referral by token
             try:
                 broker = Referral.objects.get(code=token)
             except Referral.DoesNotExist:
                 return Response({'error': 'Invalid broker token'}, status=400)
 
-            # Проверяем, есть ли уже Userbroker с таким email
+            # 2. Check if email already exists
             if Userbroker.objects.filter(email=email).exists():
                 return Response(
-                    {'error': 'Userbroker with this email already exists'},
+                    {'error': 'User with this email already exists'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+            # 3. Check if this broker user already registered (IMPORTANT)
+            if Userbroker.objects.filter(
+                broker_user_id=broker_user_id,
+                broker_ref=broker
+            ).exists():
+                return Response(
+                    {'error': 'This broker user is already registered'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-            Userbroker.objects.create(
+            # 4. Create Userbroker
+            user = Userbroker.objects.create(
                 email=email,
                 broker_ref=broker,
                 nickname=nickname,
-                country_code=country_code
+                country_code=country_code,
+                broker_user_id=broker_user_id  # <-- ADDED
             )
 
-            return Response({'message': 'Broker registered successfully'}, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    'message': 'Broker user registered successfully',
+                    'id': user.id,
+                    'broker_user_id': user.broker_user_id,
+                    'email': user.email,
+                    'nickname': user.nickname,
+                    'country_code': user.country_code
+                },
+                status=status.HTTP_201_CREATED
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
@@ -911,9 +934,9 @@ class FTD_BrokerView(APIView):
             status.HTTP_201_CREATED: FTD_BrokerSer(),
         }
     )
-    def post(self, request, token):
+    def post(self, request, token,user_id):
         """Create FTD only if not already exists for this user_broker."""
-        ref = get_object_or_404(Userbroker, broker_ref__code=token)
+        ref = get_object_or_404(Userbroker, broker_ref__code=token,broker_user_id=user_id)
 
         # check if FTD already exists for this broker
         existing_ftd = FTD.objects.filter(user_broker=ref).first()
@@ -936,3 +959,25 @@ class FTD_BrokerView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class UpdateBrokerView(APIView):
+    serializer_class = Update_Broker_Ser
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: Update_Broker_Ser(),
+        }
+    )
+
+    def patch(self,request,token,user_id):
+        ref = get_object_or_404(Userbroker, broker_ref__code=token, broker_user_id=user_id)
+        serializer = self.serializer_class(ref, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "message": "Broker updated successfully!",
+                "data": serializer.data
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            "message": "Broker update failed!",
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)

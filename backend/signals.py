@@ -33,16 +33,7 @@ def create_walet(sender,instance,*args,**kwargs):
 
 
 
-@receiver(post_save,sender=Userbroker)
-def create_ftd(sender,instance,created,*args,**kwargs):
-    if instance.broker_ref and hasattr(instance.broker_ref, 'profile') and instance.deposit >0:
-        FTD.objects.get_or_create(
-                user_broker=instance,
-                defaults={
-                    'recommended_by': instance.broker_ref.profile,
-                    'ftd': instance.deposit
-                }
-            )
+
 
 
 

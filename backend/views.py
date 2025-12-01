@@ -3,6 +3,7 @@ from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.db import connection
 from django.db import models
+from decimal import Decimal
 from django.shortcuts import get_object_or_404
 from rest_framework.throttling import UserRateThrottle
 from django.db import IntegrityError
@@ -966,18 +967,55 @@ class UpdateBrokerView(APIView):
             status.HTTP_200_OK: Update_Broker_Ser(),
         }
     )
+    def patch(self, request, token, user_id):
+        broker_user = get_object_or_404(Userbroker, broker_ref__code=token, broker_user_id=user_id)
 
-    def patch(self,request,token,user_id):
-        ref = get_object_or_404(Userbroker, broker_ref__code=token, broker_user_id=user_id)
-        serializer = self.serializer_class(ref, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                "message": "Broker updated successfully!",
-                "data": serializer.data
-            }, status=status.HTTP_200_OK)
+        # старые значения
+        old_profit = broker_user.profit
+        old_turnover = broker_user.oborot
 
+        # сериализатор
+        serializer = self.serializer_class(broker_user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # новые значения, которые брокер прислал
+        new_profit = serializer.validated_data.get("profit", old_profit)
+        new_turnover = serializer.validated_data.get("oborot", old_turnover)
+
+
+        # вычисляем дельты
+        profit_delta = max(new_profit - old_profit, 0)
+        turnover_delta = max(new_turnover - old_turnover, 0)
+
+        # сохраняем изменения
+        serializer.save()
+        partner = broker_user.broker_ref.profile
+
+        if broker_user.broker_ref.referral_type == "doxod":
+            profit_bonus = Decimal(profit_delta) * Decimal('0.40')
+            partner.income_doxod += profit_bonus
+            partner.save(update_fields=['income_doxod'])
+        elif broker_user.broker_ref.referral_type == "oborot":
+            turnover_bonus = Decimal(turnover_delta) * Decimal('0.02')  # 2%
+            partner.income_oborot += turnover_bonus
+            partner.save(update_fields=['income_oborot'])
         return Response({
-            "message": "Broker update failed!",
-            "errors": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+            "status": "ok",
+            "updated_data": serializer.data
+        })
+
+    # def patch(self,request,token,user_id):
+    #     # ref = get_object_or_404(Userbroker, broker_ref__code=token, broker_user_id=user_id)
+    #     # serializer = self.serializer_class(ref, data=request.data, partial=True)
+    #     # if serializer.is_valid():
+    #     #     serializer.save()
+    #     #     return Response({
+    #     #         "message": "Broker updated successfully!",
+    #     #         "data": serializer.data
+    #     #     }, status=status.HTTP_200_OK)
+    #     #
+    #     # return Response({
+    #     #     "message": "Broker update failed!",
+    #     #     "errors": serializer.errors
+    #     # }, status=status.HTTP_400_BAD_REQUEST)
+

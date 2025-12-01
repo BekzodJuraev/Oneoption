@@ -33,8 +33,7 @@ class Userbroker(Base):
     #     # Get the profile level
     #     level = self.broker_ref.profile.level
     #
-    #     # Set doxodnost based on profile level, defaulting to 0 if level is not in the dictionary
-    #     self.doxodnost = level_to_doxodnost.get(level, 0)
+    #
     #
     #     # Call the superclass save method
     #     super().save(*args, **kwargs)

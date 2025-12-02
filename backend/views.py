@@ -1019,3 +1019,17 @@ class UpdateBrokerView(APIView):
     #     #     "errors": serializer.errors
     #     # }, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+class Demo_View(APIView):
+
+    def post(self, request, token):
+
+        _ = request.data
+
+        ref = get_object_or_404(Referral, code=token, type='fast')
+
+        return Response(
+            {"message": "Demo status open", "token": token},
+            status=status.HTTP_200_OK
+        )

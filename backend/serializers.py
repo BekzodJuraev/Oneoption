@@ -112,6 +112,8 @@ class Update_Broker_Ser(serializers.ModelSerializer):
         fields=['deposit','withdraw','oborot','balance','profit','doxodnost']
 
 
+
+
 class Refferal_list_Ser(serializers.ModelSerializer):
     doxod_procent=serializers.IntegerField(source='doxodnost',default=0,min_value=0,max_value=100)
     oborot=serializers.DecimalField(default=0,max_digits=10, decimal_places=2)

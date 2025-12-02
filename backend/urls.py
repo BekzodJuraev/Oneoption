@@ -30,6 +30,7 @@ urlpatterns=[
     path('broker/register/',views.RegisterBrokerView.as_view(),name='broker_register'),
     path('broker/update/<uuid:token>/<int:user_id>',views.UpdateBrokerView.as_view()),
     path('broker/ftd/<uuid:token>/<int:user_id>', views.FTD_BrokerView.as_view()),
+    path('broker/demo-login/<uuid:token>/',views.Demo_View.as_view()),
 
 
 

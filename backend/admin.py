@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet,Withdraw
+from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet,Withdraw,Promocode,Type_promo
+
+@admin.register(Promocode)
+class Promocode(admin.ModelAdmin):
+    pass
+
+@admin.register(Type_promo)
+class Type_promo(admin.ModelAdmin):
+    pass
 
 @admin.register(Withdraw)
 class Withdraw(admin.ModelAdmin):

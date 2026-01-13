@@ -51,7 +51,16 @@ class Profile(Base):
 
     def __str__(self):
         return self.email
-
+class Type_promo(Base):
+    name=models.CharField(max_length=200)
+class Promocode(Base):
+    name=models.CharField(max_length=200)
+    promo_code=models.CharField(max_length=200,unique=True)
+    type_of_promocode=models.ForeignKey(Type_promo,on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='promo')
+    end_time=models.DateTimeField()
+    percentage=models.IntegerField(validators=[MinValueValidator(10), MaxValueValidator(70)])
+    limit=models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)])
 
 class Referral(Base):
     REFERRAL_TYPES = (

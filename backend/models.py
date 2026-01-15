@@ -89,7 +89,9 @@ class Referral(Base):
 
 
 
-
+# class Notifacation(Base):
+#     title=models.CharField(max_length=200)
+#     message = models.TextField()
 
 class Click_Referral(Base):
     referral_link=models.ForeignKey(Referral,on_delete=models.CASCADE,related_name='referal_link')

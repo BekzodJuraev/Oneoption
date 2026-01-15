@@ -172,7 +172,7 @@ class LoginFormSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
 class ClickToken(serializers.Serializer):
-    token_ref = serializers.CharField(required=True)
+    token_ref = serializers.UUIDField(required=True)
 
 
 

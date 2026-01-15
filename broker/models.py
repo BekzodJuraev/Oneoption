@@ -15,7 +15,7 @@ class Userbroker(Base):
 
     doxodnost = models.IntegerField(
         default=1,  # минимальное значение
-        validators=[MinValueValidator(1), MaxValueValidator(100)]
+        validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
     oborot=models.DecimalField(max_digits=10, decimal_places=2, default=0)
     profit=models.DecimalField(max_digits=10, decimal_places=2, default=0)

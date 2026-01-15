@@ -1,4 +1,4 @@
 test.png
 test_*.png
 uploads/
-
+db.sqlite3

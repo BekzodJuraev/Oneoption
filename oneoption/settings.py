@@ -178,9 +178,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',  # Uncomment if needed
     ],
-    'DEFAULT_THROTTLE_RATES': {
-        'user': '2/day',  # Allows 10 requests per minute per user/IP
-    }
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'user': '2/day',  # Allows 10 requests per minute per user/IP
+    # }
 }
 
 SITE_ID = 1

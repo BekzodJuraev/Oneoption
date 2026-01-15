@@ -97,7 +97,7 @@ class LoginAPIView(APIView):
 
 class Token_Click(APIView):
     serializer_class=ClickToken
-    throttle_classes = [UserRateThrottle]
+
 
     @swagger_auto_schema(
         responses={status.HTTP_200_OK: ClickToken()}
@@ -106,16 +106,15 @@ class Token_Click(APIView):
         form = self.serializer_class(data=request.data)
         if form.is_valid():
             token_ref = form.validated_data.get('token_ref')
-            try:
-                get_link = Referral.objects.get(code=token_ref)
+            get_link = get_object_or_404(Referral, code=token_ref)
+            Click_Referral.objects.create(referral_link=get_link)
 
-                # Check if the user/IP is allowed to proceed
-                self.check_throttles(request)
+            return Response({'message': 'Click to link created'}, status=status.HTTP_201_CREATED)
 
-                Click_Referral.objects.create(referral_link=get_link)
-                return Response({'message': 'Click to link created'}, status=status.HTTP_201_CREATED)
-            except Referral.DoesNotExist:
-                return Response({'message': 'Token invalid'}, status=status.HTTP_404_NOT_FOUND)
+
+
+        else:
+            return Response({'message': 'Token invalid'}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({'message': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
 

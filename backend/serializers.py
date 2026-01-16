@@ -6,9 +6,19 @@ from .models import Profile,Referral,Wallet,Wallet_Type,FTD,Notifacation
 from broker.models import Userbroker
 
 class GETNOTIFCATIONSER(serializers.ModelSerializer):
+    payload = serializers.SerializerMethodField()
     class Meta:
         model=Notifacation
-        fields=['title','nickname','broker_user_id','level']
+        fields=['title','payload']
+
+    def get_payload(self, obj):
+        if obj.title == 'level':
+            return {"level": obj.level}
+        if obj.title == 'register':
+            return {"nickname": obj.nickname, "broker_user_id": obj.broker_user_id}
+        if obj.title == 'ftd':
+            return {"nickname": obj.nickname, "broker_user_id": obj.broker_user_id}
+        return {}
 
 class WithdrawSerPOST(serializers.Serializer):
     wallet=serializers.CharField()

@@ -62,6 +62,12 @@ class Promocode(Base):
     percentage=models.IntegerField(validators=[MinValueValidator(10), MaxValueValidator(70)])
     limit=models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)])
 
+
+class Promo_activation(Base):
+    promo=models.ForeignKey(Promocode, on_delete=models.CASCADE, related_name='promo_active')
+
+
+
 class Referral(Base):
     REFERRAL_TYPES = (
         ('doxod', 'Доля дохода'),

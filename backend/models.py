@@ -89,9 +89,23 @@ class Referral(Base):
 
 
 
-# class Notifacation(Base):
-#     title=models.CharField(max_length=200)
-#     message = models.TextField()
+class Notifacation(Base):
+
+    TiTLE_Choice=(
+        ('level',"Уровень"),
+        ('register',"Регистрация"),
+        ('ftd',"FTD")
+    )
+    title=models.CharField(max_length=20,choices=TiTLE_Choice)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='notification')
+    nickname = models.CharField(max_length=200,null=True,blank=True)
+    broker_user_id = models.BigIntegerField(null=True,blank=True)
+    is_read=models.BooleanField(default=False)
+    level = models.PositiveIntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.profile.email} - {self.title}"
+
 
 class Click_Referral(Base):
     referral_link=models.ForeignKey(Referral,on_delete=models.CASCADE,related_name='referal_link')

@@ -1,9 +1,14 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Profile,Referral,Wallet,Wallet_Type,FTD
+from .models import Profile,Referral,Wallet,Wallet_Type,FTD,Notifacation
 
 from broker.models import Userbroker
+
+class GETNOTIFCATIONSER(serializers.ModelSerializer):
+    class Meta:
+        model=Notifacation
+        fields=['title','nickname','broker_user_id','level']
 
 class WithdrawSerPOST(serializers.Serializer):
     wallet=serializers.CharField()
@@ -173,7 +178,6 @@ class LoginFormSerializer(serializers.Serializer):
 
 class ClickToken(serializers.Serializer):
     token_ref = serializers.UUIDField(required=True)
-
 
 
 

@@ -1,9 +1,28 @@
 from django.contrib.auth.models import User
-from .models import Profile,Referral,FTD,Wallet
+from .models import Profile,Referral,FTD,Wallet,Notifacation
 from broker.models import Userbroker
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
 import requests
+
+
+@receiver(post_save,sender=Userbroker)
+def create_notifcation_register(sender,instance,created,*args,**kwargs):
+    if created:
+        Notifacation.objects.create(profile=instance.broker_ref.profile,broker_user_id=instance.broker_user_id,
+                                    title='register',nickname=instance.nickname)
+
+@receiver(post_save,sender=FTD)
+def create_notifcation_ftd(sender,instance,created,*args,**kwargs):
+    if created:
+        Notifacation.objects.create(profile=instance.recommended_by,broker_user_id=instance.user_broker.broker_user_id,
+                                    title='ftd',nickname=instance.user_broker.nickname)
+
+
+
+
+
+
 
 @receiver(pre_save,sender=Wallet)
 def create_walet(sender,instance,*args,**kwargs):

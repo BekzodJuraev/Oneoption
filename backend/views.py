@@ -24,7 +24,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type,Withdraw,Notifacation,Type_promo,Promocode,Promo_activation
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer,Update_Broker_Ser,GETNOTIFCATIONSER,Type_PromoSeR,PromoSer
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer,Update_Broker_Ser,GETNOTIFCATIONSER,Type_PromoSeR,PromoSer,Available_PromoSer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -855,7 +855,27 @@ class Withdraw_View(APIView):
 
 
 
+class Available_PromoView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: Available_PromoSer()}
+    )
+    def get(self,request):
+        level=request.user.profile.level
+        promo = {
+            2: [10, 20, 30, 40],
+            3: [20, 30, 40, 50],
+            4: [30, 40, 50, 60],
+            5: [40, 50, 60, 70]
+        }
+
+        dic={
+            "level":level,
+            "list_of_promo": promo.get(level, "")
+        }
+        serializer=Available_PromoSer(dic)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 class PromoViewList(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -883,8 +903,26 @@ class PromoView(APIView):
     )
     def post(self,request):
         serializer = PromoSer(data=request.data)
+        profile=request.user.profile
+        promo_count=Promocode.objects.filter(profile=profile).count()
+        LEVEL_LIMITS = {
+            1: 0,  # Level 1: cannot create promos
+            2: 1,  # Level 2: max 1 promo
+            3: 3,  # Level 3: max 3 promos
+            4: 10,  # Level 4: max 5 promos
+            5: 20,  # Level 5: max 10 promos
+        }
+        limit = LEVEL_LIMITS.get(profile.level, 0)
+
+        if promo_count >= limit:
+            return Response(
+                {"detail": f"Promo limit reached for level {profile.level}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
         if serializer.is_valid():
-            serializer.save(profile=request.user.profile)
+            serializer.save(profile=profile)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

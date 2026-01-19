@@ -33,7 +33,8 @@ urlpatterns=[
     path('broker/demo-login/<uuid:token>/',views.Demo_View.as_view()),
     path('notification/',views.NotifactionView.as_view(),),
     path('promo/',views.PromoView.as_view()),
-    path('promo/list',views.PromoViewList.as_view())
+    path('promo/list',views.PromoViewList.as_view()),
+    path('promo/available',views.Available_PromoView.as_view())
 
 
 

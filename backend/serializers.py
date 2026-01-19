@@ -26,7 +26,9 @@ class PromoSer(serializers.ModelSerializer):
 
     # def get_activation(self,obj):
     #     return Promo_activation.objects.filter(promo=obj).count()
-
+class Available_PromoSer(serializers.Serializer):
+    list_of_promo=serializers.ListField()
+    level=serializers.IntegerField()
 class GETNOTIFCATIONSER(serializers.ModelSerializer):
     payload = serializers.SerializerMethodField()
     class Meta:

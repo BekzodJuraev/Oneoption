@@ -60,7 +60,7 @@ class Promocode(Base):
     promo_code=models.CharField(max_length=200,unique=True)
     type_of_promocode=models.ForeignKey(Type_promo,on_delete=models.CASCADE)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='promo')
-    end_time=models.DateTimeField()
+    end_time=models.DateField()
     percentage=models.IntegerField(validators=[MinValueValidator(10), MaxValueValidator(70)])
     limit=models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(20)])
 

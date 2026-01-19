@@ -24,7 +24,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type,Withdraw,Notifacation,Type_promo,Promocode,Promo_activation
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer,Update_Broker_Ser,GETNOTIFCATIONSER,Type_PromoSeR,PromoSer,Available_PromoSer
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer,Update_Broker_Ser,GETNOTIFCATIONSER,Type_PromoSeR,PromoSer,Available_PromoSer,PromoActivationSer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -1113,3 +1113,35 @@ class Demo_View(APIView):
             {"message": "Demo status open", "token": token},
             status=status.HTTP_200_OK
         )
+
+class PromoActivationView(APIView):
+    serializer_class = PromoActivationSer
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: PromoActivationSer(),
+        }
+    )
+
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            promo = get_object_or_404(Promocode, promo_code=serializer.validated_data['name'])
+            active_count=Promo_activation.objects.filter(promo=promo).count()
+            today = date.today()
+            if today > promo.end_time:
+                return Response(
+                    {"detail": "Time of promo expired"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if active_count >= promo.limit:
+                return Response({"detail": "Promo activation limit reached"}, status=status.HTTP_400_BAD_REQUEST)
+            Promo_activation.objects.create(promo=promo)
+
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+

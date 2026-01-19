@@ -1,5 +1,10 @@
 from django.contrib import admin
-from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet,Withdraw,Promocode,Type_promo,Notifacation
+from .models import Profile,PasswordReset,Referral,Click_Referral,FTD,Wallet_Type,Wallet,Withdraw,Promocode,Type_promo,Notifacation,Promo_activation
+
+@admin.register(Promo_activation)
+class Promo_activation(admin.ModelAdmin):
+    pass
+
 @admin.register(Notifacation)
 class Notifacation(admin.ModelAdmin):
     pass

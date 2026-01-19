@@ -1,9 +1,31 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import Profile,Referral,Wallet,Wallet_Type,FTD,Notifacation
+from .models import Profile,Referral,Wallet,Wallet_Type,FTD,Notifacation,Promocode,Type_promo,Promo_activation
 
 from broker.models import Userbroker
+
+
+class Type_PromoSeR(serializers.ModelSerializer):
+    class Meta:
+        model=Type_promo
+        fields=['id','name']
+
+class PromoSer(serializers.ModelSerializer):
+    type_of_promocode_id = serializers.PrimaryKeyRelatedField(
+        source='type_of_promocode',
+        queryset=Type_promo.objects.all()
+    )
+    id=serializers.ReadOnlyField()
+    type_of_promocode_name=serializers.ReadOnlyField(source='type_of_promocode.name')
+    activation_count=serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model=Promocode
+        fields=['id','promo_code','type_of_promocode_id','activation_count','type_of_promocode_name','end_time','percentage','limit']
+
+    # def get_activation(self,obj):
+    #     return Promo_activation.objects.filter(promo=obj).count()
 
 class GETNOTIFCATIONSER(serializers.ModelSerializer):
     payload = serializers.SerializerMethodField()

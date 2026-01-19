@@ -22,9 +22,9 @@ from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
-from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type,Withdraw,Notifacation
+from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type,Withdraw,Notifacation,Type_promo,Promocode,Promo_activation
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer,Update_Broker_Ser,GETNOTIFCATIONSER
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer,Update_Broker_Ser,GETNOTIFCATIONSER,Type_PromoSeR,PromoSer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -856,7 +856,37 @@ class Withdraw_View(APIView):
 
 
 
+class PromoViewList(APIView):
+    permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: PromoSer(many=True)}
+    )
+    def get(self,request):
+        promo = Promocode.objects.filter(profile=request.user.profile).select_related('type_of_promocode').annotate(activation_count=Count('promo_active'))
+        serializer = PromoSer(promo, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+class PromoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: Type_PromoSeR(many=True)}
+    )
+
+    def get(self,request):
+        promo=Type_promo.objects.all()
+        serializer=Type_PromoSeR(promo,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        responses={status.HTTP_201_CREATED: PromoSer()}
+    )
+    def post(self,request):
+        serializer = PromoSer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(profile=request.user.profile)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class NotifactionView(APIView):
     serializer_class=GETNOTIFCATIONSER

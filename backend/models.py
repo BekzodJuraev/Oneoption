@@ -68,8 +68,6 @@ class Promocode(Base):
         return self.type_of_promocode.name
 
 
-class Promo_activation(Base):
-    promo=models.ForeignKey(Promocode, on_delete=models.CASCADE, related_name='promo_active')
 
 
 
@@ -103,9 +101,9 @@ class Referral(Base):
 class Notifacation(Base):
 
     TiTLE_Choice=(
-        ('level',"Уровень"),
-        ('register',"Регистрация"),
-        ('ftd',"FTD")
+        ('level',"Вы достигли новый уровень !"),
+        ('register',"У вас новый реферал !"),
+        ('ftd',"Реферал сделал первый депозит !")
     )
     title=models.CharField(max_length=20,choices=TiTLE_Choice)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='notification')
@@ -180,4 +178,8 @@ class Withdraw(Base):
 
 
 
+class Promo_activation(Base):
+    from broker.models import Userbroker
+    user_broker = models.ForeignKey(Userbroker, on_delete=models.CASCADE, related_name='promo_activation_broker',null=True)
+    promo=models.ForeignKey(Promocode, on_delete=models.CASCADE, related_name='promo_active')
 

@@ -1016,7 +1016,7 @@ class FTD_BrokerView(APIView):
         }
     )
     def post(self, request, token,user_id):
-        """Create FTD only if not already exists for this user_broker."""
+
         ref = get_object_or_404(Userbroker, broker_ref__code=token,broker_user_id=user_id)
 
         # check if FTD already exists for this broker
@@ -1123,7 +1123,8 @@ class PromoActivationView(APIView):
         }
     )
 
-    def post(self,request):
+    def post(self,request,user_id):
+        user_broker = get_object_or_404(Userbroker, broker_user_id=user_id)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             promo = get_object_or_404(Promocode, promo_code=serializer.validated_data['name'])
@@ -1137,10 +1138,16 @@ class PromoActivationView(APIView):
 
             if active_count >= promo.limit:
                 return Response({"detail": "Promo activation limit reached"}, status=status.HTTP_400_BAD_REQUEST)
-            Promo_activation.objects.create(promo=promo)
+            bonus,created=Promo_activation.objects.get_or_create(promo=promo,user_broker=user_broker)
+            if created:
+                return Response({'message': "created", "bonus_percentage": bonus.promo.percentage},
+                                status=status.HTTP_201_CREATED)
+            else:
+                return Response({'message': "already exist",},
+                                status=status.HTTP_400_BAD_REQUEST)
 
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 
 

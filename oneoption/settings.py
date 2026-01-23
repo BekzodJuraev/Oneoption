@@ -189,7 +189,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://one-option.onrender.com",
     "http://one-option.onrender.com",
     "https://api.optimax.vip",
-    "https://optimax.vip"
+    "https://optimax.vip",
+    "https://affilate.optimax.vip"
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True

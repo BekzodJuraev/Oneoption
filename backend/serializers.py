@@ -33,19 +33,28 @@ class Available_PromoSer(serializers.Serializer):
     list_of_promo=serializers.ListField()
     level=serializers.IntegerField()
 class GETNOTIFCATIONSER(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
     payload = serializers.SerializerMethodField()
+
     class Meta:
         model=Notifacation
         fields=['title','payload']
 
+    def get_title(self, obj):
+
+        return obj.get_title_display()
+
     def get_payload(self, obj):
         if obj.title == 'level':
-            return {"level": obj.level}
+            return f"Вы достигли уровня {obj.level}"
+
         if obj.title == 'register':
-            return {"nickname": obj.nickname, "broker_user_id": obj.broker_user_id}
+            return f"По вашей ссылке зарегистрировался {obj.nickname} ID {obj.broker_user_id}"
+
         if obj.title == 'ftd':
-            return {"nickname": obj.nickname, "broker_user_id": obj.broker_user_id}
-        return {}
+            return f"{obj.nickname} сделал FTD (ID: {obj.broker_user_id})"
+
+        return ""
 
 class WithdrawSerPOST(serializers.Serializer):
     wallet=serializers.CharField()

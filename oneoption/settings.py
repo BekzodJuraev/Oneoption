@@ -19,18 +19,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = 'django-insecure-vlc0@-5)^x8ywa*d5soz-br_=xzb2ji75p04i-1d2f3m!m7c6b'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://dd12-213-230-93-50.ngrok-free.app',
+    "http://localhost:5173",
+    "https://one-option.onrender.com",
+    "http://one-option.onrender.com",
+    "https://api.optimax.vip",
+    "https://optimax.vip",
+    "https://affilate.optimax.vip"
 ]
-# Application definition
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',

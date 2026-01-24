@@ -24,7 +24,7 @@ from django.db.models.functions import TruncHour
 from django.db.models import Sum,Q,Count,F,Max,Prefetch,Value,IntegerField
 from .models import PasswordReset,Profile,Referral,Click_Referral,FTD,Wallet,Wallet_Type,Withdraw,Notifacation,Type_promo,Promocode,Promo_activation
 from .serializers import  \
-    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer,Update_Broker_Ser,GETNOTIFCATIONSER,Type_PromoSeR,PromoSer,Available_PromoSer,PromoActivationSer
+    Refferal_count_all,LoginFormSerializer,RegistrationSerializer,PasswordChangeSerializer,ResetPasswordRequestSerializer,PasswordResetSerializer,GetProfile,UpdateProfile,SetPictures,Refferal_Ser,Refferal_list_Ser,Refferal_count_all_,GetProfile_main,GetProfile_main_chart,GetProfile_main_chart_,GetProfile_balance,GetWallet_type,WalletPOST,WithdrawSer,ClickToken,WithdrawSerPOST,PartnerLevelSerializer,RegisterBroker,FTD_BrokerSer,Update_Broker_Ser,GETNOTIFCATIONSER,Type_PromoSeR,PromoSer,Available_PromoSer,PromoActivationSer,Promocode_ListSer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -1150,5 +1150,25 @@ class PromoActivationView(APIView):
 
 
 
+
+class Promo_ListView(APIView):
+
+
+    serializer_class = Promocode_ListSer
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: Promocode_ListSer(many=True),
+        }
+    )
+    def get(self,request,token):
+        if token == "Optimax_2026":
+            p=Promocode.objects.all()
+
+            serializer = self.serializer_class(p, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': "Token invalid"},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 

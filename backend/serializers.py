@@ -55,6 +55,12 @@ class GETNOTIFCATIONSER(serializers.ModelSerializer):
             return f"{obj.nickname} сделал FTD (ID: {obj.broker_user_id})"
 
         return ""
+class Promocode_ListSer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Promocode
+        fields = ['promo_code', 'percentage']
+
 
 class WithdrawSerPOST(serializers.Serializer):
     wallet=serializers.CharField()

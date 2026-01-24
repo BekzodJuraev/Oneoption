@@ -32,6 +32,7 @@ urlpatterns=[
     path('broker/ftd/<uuid:token>/<int:user_id>', views.FTD_BrokerView.as_view()),
     path('broker/demo-login/<uuid:token>/',views.Demo_View.as_view()),
     path('broker/promo/active/<int:user_id>',views.PromoActivationView.as_view()),
+    path('broker/promo/list/<str:token>',views.Promo_ListView.as_view()),
     path('notification/',views.NotifactionView.as_view(),),
     path('promo/',views.PromoView.as_view()),
     path('promo/list',views.PromoViewList.as_view()),
